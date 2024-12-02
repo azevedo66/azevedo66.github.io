@@ -1,4 +1,3 @@
-#selectTeamDropdown {
-    display: block;
-    visibility: visible;
+#btn-menu-container, #roster-screen-container {
+    display: none;
 }

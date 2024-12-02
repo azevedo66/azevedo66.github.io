@@ -1,3 +1,5 @@
+let userSelectedTeam;
+
 const teams = {};
 
 const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
@@ -61,7 +63,7 @@ function createRandomPlayer(position, year, role) {
         if (position === "Point Guard") {
             const heights = ["5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""];
             return heights[randomIndex];
-        } else if (position === "ShootingGuard") {
+        } else if (position === "Shooting Guard") {
             const heights = ["6'3\"", "6'4\"", "6'5\"", "6'6\"", "6'7\""];
             return heights[randomIndex];
         } else if (position === "Small Forward") {
@@ -155,10 +157,38 @@ function selectTeamScreen() {
 document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
     event.preventDefault();
     const selectTeamDropdown = document.getElementById("selectTeamDropdown");
-    const selectedTeam = selectTeamDropdown.value;
-    document.getElementById("selectedTeam").textContent = `You selected: ${selectedTeam}`;
+    userSelectedTeam = selectTeamDropdown.value;
     createLeague();
+    rosterScreen();
     console.log(teams);
 });
 
+function rosterScreen() {
+    hideAllScreens();
+    document.getElementById("btn-menu-container").style.display = "block";
+    document.getElementById("roster-screen-container").style.display = "block";
+    for (const conference in teams) {
+        for (const team in teams[conference]) {
+            if (team === userSelectedTeam) {
+                for (let i = 0; i < teams[conference][team]["starters"].length; i++) {
+                    const player = teams[conference][team]["starters"][i];
+                    const playerDiv = document.createElement("div");
+                    document.getElementById("starters-container").append(playerDiv);
+                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight}`;
+                }
+                for (let i = 0; i < teams[conference][team]["bench"].length; i++) {
+                    const player = teams[conference][team]["bench"][i];
+                    const playerDiv = document.createElement("div");
+                    document.getElementById("bench-container").append(playerDiv);
+                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight}`;
+                }
+            }
+        }
+    }
+    
+}
+
+function hideAllScreens() {
+    document.getElementById("start-screen-container").style.display = "none";
+}
 selectTeamScreen();
