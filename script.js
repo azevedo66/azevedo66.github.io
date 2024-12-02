@@ -179,6 +179,69 @@ function orderStandings() {
     }
 }
 
+function simulateGame(team1, team2) {
+    const starterPossessions = 50;
+    const benchPossessions = 25;
+    let teamScore1 = 0;
+    let teamScore2 = 0;
+
+    function simulatePossession(team, lineup) {
+        let player;
+        if (lineup === "starters") {
+            const randomPlayerIndex = Math.floor(Math.random() * team.starters.length);
+            player = team.starters[randomPlayerIndex];
+        } else {
+            const randomPlayerIndex = Math.floor(Math.random() * team.bench.length);
+            player = team.bench[randomPlayerIndex];
+        }
+        const points = simulatePlayerScore(player);
+        return points;
+    }
+
+    function simulatePlayerScore(player) {
+        const randomNum = Math.random() * 100;
+        const minFgPercentage = 40;
+        const playerFgPercentage = ((player - 69) * 0.5) + minFgPercentage;
+        if (randomNum < playerFgPercentage) {
+            const pointAmountNum = Math.random() * 100;
+            if (pointAmountNum < 70) {
+                return 2;
+            } else {
+                return 3;
+            }
+        }
+
+        return 0;
+    }
+
+    for (let i = 0; i < starterPossessions; i++) {
+        const possession1 = simulatePossession(team1, "starters");
+        const possession2 = simulatePossession(team2, "starters");
+        teamScore1 += possession1;
+        teamScore2 += possession2;
+    }
+
+    for (let i = 0; i < benchPossessions; i++) {
+        const possession1 = simulatePossession(team1, "bench");
+        const possession2 = simulatePossession(team2, "bench");
+        teamScore1 += possession1;
+        teamScore2 += possession2;
+    }
+
+    if (teamScore1 > teamScore2) {
+        return team1;
+    } else if (teamScore2 > teamScore1) {
+        return team2;
+    } else {
+        const randomWinner = Math.floor(Math.random());
+        if (randomWinner === 1) {
+            return team1;
+        } else {
+            return team2;
+        }
+    }
+}
+
 function selectTeamScreen() {
     const selectTeamDropdown = document.getElementById("selectTeamDropdown");
     let index = 1;
