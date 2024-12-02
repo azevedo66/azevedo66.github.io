@@ -128,14 +128,33 @@ function createLeague() {
             }
             let overallSum = 0;
             for (let i = 0; i < 5; i++) {
-                overallSum += starters[i];
-                overallSum += bench[i];
+                overallSum += starters[i].overall;
+                overallSum += bench[i].overall;
             }
             const teamOverall = Math.round((overallSum + 70) / 10);
             const teamName = conferenceTeams[conference][i];
             const conferenceName = conference;
             const team = new Team(teamName, conferenceName, 0, 0, i + 1, teamOverall, i + 1, starters, bench);
             teams[conference][conferenceTeams[conference][i]] = team;
+        }
+    }
+}
+
+function orderStandings() {
+    for (const conference in teams) {
+        const teamsArr = [];
+        for (const team in teams[conference]) {
+            teamsArr.push({name: teams[conference][team].name, wins: teams[conference][team].wins, standing: teams[conference][team].standing});
+        }
+        teamsArr.sort(function(a, b) {
+            return b.wins - a.wins;
+        });
+        for (let i = 1; i < teamsArr.length + 1; i++) {
+            for (const team in teams[conference]) {
+                if (teams[conference][team].name === teamsArr[i - 1].name) {
+                    teams[conference][team].standing = i;
+                }
+            }
         }
     }
 }
@@ -167,6 +186,9 @@ function rosterScreen() {
     hideAllScreens();
     document.getElementById("btn-menu-container").style.display = "block";
     document.getElementById("roster-screen-container").style.display = "block";
+    document.getElementById("starters-container").innerHTML = "";
+    document.getElementById("bench-container").innerHTML = "";
+    document.getElementById("roster-screen-team-name").innerHTML = userSelectedTeam;
     for (const conference in teams) {
         for (const team in teams[conference]) {
             if (team === userSelectedTeam) {
@@ -185,10 +207,40 @@ function rosterScreen() {
             }
         }
     }
-    
+}
+
+function standingsScreen() {
+    hideAllScreens();
+    orderStandings();
+    document.getElementById("btn-menu-container").style.display = "block";
+    document.getElementById("standings-screen-container").style.display = "block";
+    document.getElementById("standings-screen-container").innerHTML = "";
+    for (const conference in teams) {
+        const conferenceDiv = document.createElement("div");
+        const conferenceTitle = document.createElement("div");
+        conferenceDiv.id = conference;
+        conferenceTitle.id = conference + "-title-standings";
+        conferenceTitle.className = "conference-title-standings";
+        conferenceTitle.innerHTML = conference;
+        document.getElementById("standings-screen-container").append(conferenceDiv);
+        document.getElementById(conference).append(conferenceTitle);
+        for (let i = 1; i <= 16; i++) {
+            for (const team in teams[conference]) {
+                if (teams[conference][team].standing === i) {
+                    const teamDiv = document.createElement("div");
+                    document.getElementById(conference).append(teamDiv);
+                    teamDiv.innerHTML = `${i}. ${team} (${teams[conference][team].overall} ovr) (${teams[conference][team].wins}-${teams[conference][team].losses})`;
+                }
+            }
+        }
+    }
 }
 
 function hideAllScreens() {
     document.getElementById("start-screen-container").style.display = "none";
+    document.getElementById("btn-menu-container").style.display = "none";
+    document.getElementById("roster-screen-container").style.display = "none";
+    document.getElementById("standings-screen-container").style.display = "none";
 }
+
 selectTeamScreen();
