@@ -138,5 +138,27 @@ function createLeague() {
     }
 }
 
-createLeague();
-console.log(teams);
+function selectTeamScreen() {
+    const selectTeamDropdown = document.getElementById("selectTeamDropdown");
+    let index = 1;
+    for (const conference in conferenceTeams) {
+        for (let i = 0; i < conferenceTeams[conference].length; i++) {
+            const teamOption = document.createElement("option");
+            teamOption.value = conferenceTeams[conference][i];
+            teamOption.textContent = `${index}. ${conferenceTeams[conference][i]}`;
+            selectTeamDropdown.appendChild(teamOption);
+            index++;
+        }
+    }
+}
+
+document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    const selectTeamDropdown = document.getElementById("selectTeamDropdown");
+    const selectedTeam = selectTeamDropdown.value;
+    document.getElementById("selectedTeam").textContent = `You selected: ${selectedTeam}`;
+    createLeague();
+    console.log(teams);
+});
+
+selectTeamScreen();

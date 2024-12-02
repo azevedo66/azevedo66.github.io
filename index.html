@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>College Basketball Coach</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>College Basketball Coach</h1>
-    <hr>
+    <div id="container">
+        <h1>College Basketball Coach</h1>
+        <hr>
+        <div id="start-screen-container">
+            <form id="selectTeamForm">
+                <label for="selectTeamDropdown">Choose a team:</label>
+                <select id="selectTeamDropdown" name="team"></select>
+                <button type="submit">Submit</button>
+            </form>
+            <p id="selectedTeam"></p>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
