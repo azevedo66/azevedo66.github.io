@@ -277,20 +277,13 @@ function createBracketMatchups() {
     if (bracketMatchups.round === 1) {
         const roundMatchups = [];
         for (const conference in teams) {
-            for (let i = 0; i < firstRoundMatchups.length; i++) {
-                let team1, team2;
-                for (const team in teams[conference]) {
-                    if (teams[conference][team].standing === firstRoundMatchups[i][0]) {
-                        team1 = teams[conference][team];
-                    } else if (teams[conference][team].standing === firstRoundMatchups[i][1]) {
-                        team2 = teams[conference][team];
-                    }
-                }
+            firstRoundMatchups.forEach(([standing1, standing2]) => {
+                const team1 = Object.values(teams[conference]).find(team => team.standing === standing1);
+                const team2 = Object.values(teams[conference]).find(team => team.standing === standing2);
                 roundMatchups.push([team1, team2]);
-            }
+            });
         }
         bracketMatchups[1] = roundMatchups;
-        console.log(bracketMatchups);
     }
 }
 
