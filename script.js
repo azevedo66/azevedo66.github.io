@@ -247,6 +247,8 @@ function simulateRegularSeasonGame() {
                 }
             })
         }
+        schedule.day += 1;
+        standingsScreen();
     } else if (schedule.day === 17) {
         bracketMatchups.round += 1;
         schedule.day += 1;
@@ -259,6 +261,15 @@ function simulateRound() {
     const round = bracketMatchups.round;
     const roundMatchups = bracketMatchups[round];
     const nextRoundMatchups = [];
+
+    if (roundMatchups.length === 1) {
+        const [team1, team2] = roundMatchups[0];
+        const winner = simulateGame(team1, team2);
+        bracketMatchups.champion = winner;
+        bracketScreen();
+        return;
+    }
+
     for (let i = 0; i < roundMatchups.length; i += 2) {
          const [team1, team2] = roundMatchups[i];
          const [team3, team4] = roundMatchups[i + 1];
@@ -271,6 +282,7 @@ function simulateRound() {
     bracketMatchups.round += 1;
 
     bracketScreen();
+    console.log(bracketMatchups);
 }
 
 function createBracketMatchups() {
@@ -300,24 +312,6 @@ function selectTeamScreen() {
         }
     }
 }
-
-document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
-    event.preventDefault();
-    const selectTeamDropdown = document.getElementById("selectTeamDropdown");
-    userSelectedTeam = selectTeamDropdown.value;
-    createLeague();
-    rosterScreen();
-    console.log(teams);
-});
-
-document.getElementById("sim-btn").addEventListener("click", function (event) {
-    event.preventDefault();
-    if (schedule.day <= 17) {
-        simulateRegularSeasonGame();
-    } else {
-        simulateRound();
-    }
-})
 
 function rosterScreen() {
     hideAllScreens();
@@ -420,48 +414,56 @@ function scheduleScreen() {
 function bracketScreen() {
     hideAllScreens();
     document.getElementById("btn-menu-container").style.display = "block";
-    document.getElementById("bracket-screen-container").style.display = "flex";
-    document.getElementById("bracket-screen-container").innerHTML = "";
+    const container = document.getElementById("bracket-screen-container");
+    container.style.display = "flex";
+    container.innerHTML = "";
+
     for (const round in bracketMatchups) {
-        if (round !== "round") {
+        if (round !== "round" && round !== "champion") {
             const roundSection = document.createElement("div");
             const roundTitle = document.createElement("div");
             roundSection.id = "round-" + round + "-section";
             roundTitle.id = "round-" + round + "-title";
-            if (round > 6) {
-                roundTitle.innerHTML = "Champion";
-            } else {
-                roundTitle.innerHTML = `Round ${round}`;
-            }
-            document.getElementById("bracket-screen-container").append(roundSection);
-            document.getElementById("round-" + round + "-section").append(roundTitle);
+            roundTitle.innerHTML = `Round ${round}`;
+            container.append(roundSection);
+            roundSection.append(roundTitle);
+
             for (let i = 0; i < bracketMatchups[round].length; i++) {
-                if (round <= 6) {
-                    const matchupDiv = document.createElement("div");
-                    const teamDiv1 = document.createElement("div");
-                    const teamDiv2 = document.createElement("div");
-                    matchupDiv.id = "round-" + round + "-matchup-" + (i + 1);
-                    teamDiv1.id = "round-" + round + "-matchup-" + (i + 1) + "-team-1";
-                    teamDiv2.id = "round-" + round + "-matchup-" + (i + 1) + "-team-2";
-                    matchupDiv.className = "bracket-matchup";
-                    teamDiv1.className = "bracket-team-top";
-                    teamDiv2.className = "bracket-team-bottom";
-                    teamDiv1.innerHTML = `${bracketMatchups[round][i][0].standing}. ${bracketMatchups[round][i][0].name} (${bracketMatchups[round][i][0].overall} ovr)`;
-                    teamDiv2.innerHTML = `${bracketMatchups[round][i][1].standing}. ${bracketMatchups[round][i][1].name} (${bracketMatchups[round][i][1].overall} ovr)`;
-                    if (bracketMatchups[round][i][0].name === userSelectedTeam || bracketMatchups[round][i][1].name === userSelectedTeam) {
-                        matchupDiv.style.fontWeight = "bold";
-                    }
-                    document.getElementById("round-" + round + "-section").append(matchupDiv);
-                    document.getElementById("round-" + round + "-matchup-" + (i + 1)).append(teamDiv1);
-                    document.getElementById("round-" + round + "-matchup-" + (i + 1)).append(teamDiv2);
-                } else {
-                    const teamDiv = document.createElement("div");
-                    teamDiv.id = "champion";
-                    teamDiv.innerHTML = `${bracketMatchups[round][i].standing}. ${bracketMatchups[round][i].name} (${bracketMatchups[round][i].overall} ovr)`;
-                    document.getElementById("round-" + round + "-section").append(teamDiv);
+                const matchupDiv = document.createElement("div");
+                const teamDiv1 = document.createElement("div");
+                const teamDiv2 = document.createElement("div");
+                matchupDiv.id = `round-${round}-matchup-${i + 1}`;
+                teamDiv1.id = `round-${round}-matchup-${i + 1}-team-1`;
+                teamDiv2.id = `round-${round}-matchup-${i + 1}-team-2`;
+                matchupDiv.className = "bracket-matchup";
+                teamDiv1.className = "bracket-team-top";
+                teamDiv2.className = "bracket-team-bottom";
+                teamDiv1.innerHTML = `${bracketMatchups[round][i][0].standing}. ${bracketMatchups[round][i][0].name} (${bracketMatchups[round][i][0].overall} ovr)`;
+                teamDiv2.innerHTML = `${bracketMatchups[round][i][1].standing}. ${bracketMatchups[round][i][1].name} (${bracketMatchups[round][i][1].overall} ovr)`;
+
+                if (bracketMatchups[round][i][0].name === userSelectedTeam || bracketMatchups[round][i][1].name === userSelectedTeam) {
+                    matchupDiv.style.fontWeight = "bold";
                 }
+
+                roundSection.append(matchupDiv);
+                matchupDiv.append(teamDiv1);
+                matchupDiv.append(teamDiv2);
             }
         }
+    }
+
+    if (bracketMatchups.champion) {
+        const championSection = document.createElement("div");
+        const championTitle = document.createElement("div");
+        championSection.id = "champion-section";
+        championTitle.id = "champion-title";
+        championTitle.innerHTML = "Champion";
+        const championDiv = document.createElement("div");
+        const champion = bracketMatchups.champion;
+        championDiv.innerHTML = `${champion.standing}. ${champion.name} (${champion.overall} ovr)`;
+        container.append(championSection);
+        championSection.append(championTitle);
+        championSection.append(championDiv);
     }
 }
 
@@ -473,5 +475,22 @@ function hideAllScreens() {
     document.getElementById("schedule-screen-container").style.display = "none";
     document.getElementById("bracket-screen-container").style.display = "none";
 }
+
+document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    const selectTeamDropdown = document.getElementById("selectTeamDropdown");
+    userSelectedTeam = selectTeamDropdown.value;
+    createLeague();
+    rosterScreen();
+    console.log(teams);
+});
+
+document.getElementById("sim-btn").addEventListener("click", function (event) {
+    if (schedule.day <= 17) {
+        simulateRegularSeasonGame();
+    } else {
+        simulateRound();
+    }
+})
 
 selectTeamScreen();
