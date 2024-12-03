@@ -231,28 +231,22 @@ function simulateGame(team1, team2) {
 function simulateRegularSeasonGame() {
     if (schedule.day <= 16) {
         const day = schedule.day.toString();
+        const dayGames = schedule[day];
         for (const conference in teams) {
-            for (let i = 0; i < schedule[day].length; i++) {
-                let team1, team2;
-                for (const team in teams[conference]) {
-                    if (teams[conference][team].teamNum === schedule[day][i][0]) {
-                        team1 = teams[conference][team];
-                    } else if (teams[conference][team].teamNum === schedule[day][i][1]) {
-                        team2 = teams[conference][team];
-                    }
-                }
+            dayGames.forEach(game => {
+                const [team1Num, team2Num] = game;
+                const team1 = Object.values(teams[conference]).find(team => team.teamNum === team1Num);
+                const team2 = Object.values(teams[conference]).find(team => team.teamNum === team2Num);
                 const winner = simulateGame(team1, team2);
                 if (winner.name === team1.name) {
-                    teams[conference][team1.name].wins += 1;
-                    teams[conference][team2.name].losses += 1;
+                    team1.wins += 1;
+                    team2.losses += 1;
                 } else if (winner.name === team2.name) {
-                    teams[conference][team1.name].losses += 1;
-                    teams[conference][team2.name].wins += 1;
+                    team1.losses += 1;
+                    team2.wins += 1;
                 }
-            }
+            })
         }
-        schedule.day += 1;
-        standingsScreen();
     } else if (schedule.day === 17) {
         bracketMatchups.round += 1;
         schedule.day += 1;
@@ -264,28 +258,19 @@ function simulateRegularSeasonGame() {
 function simulateRound() {
     const round = bracketMatchups.round;
     const roundMatchups = bracketMatchups[round];
-    if (bracketMatchups.round === 6) {
-        const team1 = roundMatchups[0][0];
-        const team2 = roundMatchups[0][1];
-        const winner = simulateGame(team1, team2);
-        bracketMatchups[bracketMatchups.round + 1] = [winner];
-        bracketMatchups.round += 1;
-    } else if (bracketMatchups.round < 6) {
-        const nextRoundMatchups = [];
-        for (let i = 0; i < roundMatchups.length; i += 2) {
-            const team1 = roundMatchups[i][0];
-            const team2 = roundMatchups[i][1];
-            const team3 = roundMatchups[i + 1][0];
-            const team4 = roundMatchups[i + 1][1];
-            const winner1 = simulateGame(team1, team2);
-            const winner2 = simulateGame(team3, team4);
-            nextRoundMatchups.push([winner1, winner2]);
-        }
-        bracketMatchups[round + 1] = nextRoundMatchups;
-        bracketMatchups.round += 1;
+    const nextRoundMatchups = [];
+    for (let i = 0; i < roundMatchups.length; i += 2) {
+         const [team1, team2] = roundMatchups[i];
+         const [team3, team4] = roundMatchups[i + 1];
+         const winner1 = simulateGame(team1, team2);
+         const winner2 = simulateGame(team3, team4);
+         nextRoundMatchups.push([winner1, winner2]);
     }
+
+    bracketMatchups[round + 1] = nextRoundMatchups;
+    bracketMatchups.round += 1;
+
     bracketScreen();
-    console.log(bracketMatchups);
 }
 
 function createBracketMatchups() {
