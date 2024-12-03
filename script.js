@@ -273,6 +273,33 @@ function simulateRegularSeasonGame() {
     }
 }
 
+function simulateRound() {
+    const round = bracketMatchups.round;
+    const roundMatchups = bracketMatchups[round];
+    if (bracketMatchups.round === 6) {
+        const team1 = roundMatchups[0][0];
+        const team2 = roundMatchups[0][1];
+        const winner = simulateGame(team1, team2);
+        bracketMatchups[bracketMatchups.round + 1] = [winner];
+        bracketMatchups.round += 1;
+    } else if (bracketMatchups.round < 6) {
+        const nextRoundMatchups = [];
+        for (let i = 0; i < roundMatchups.length; i += 2) {
+            const team1 = roundMatchups[i][0];
+            const team2 = roundMatchups[i][1];
+            const team3 = roundMatchups[i + 1][0];
+            const team4 = roundMatchups[i + 1][1];
+            const winner1 = simulateGame(team1, team2);
+            const winner2 = simulateGame(team3, team4);
+            nextRoundMatchups.push([winner1, winner2]);
+        }
+        bracketMatchups[round + 1] = nextRoundMatchups;
+        bracketMatchups.round += 1;
+    }
+    bracketScreen();
+    console.log(bracketMatchups);
+}
+
 function createBracketMatchups() {
     if (bracketMatchups.round === 1) {
         const roundMatchups = [];
@@ -316,6 +343,15 @@ document.getElementById("selectTeamForm").addEventListener("submit", function (e
     rosterScreen();
     console.log(teams);
 });
+
+document.getElementById("sim-btn").addEventListener("click", function (event) {
+    event.preventDefault();
+    if (schedule.day <= 17) {
+        simulateRegularSeasonGame();
+    } else {
+        simulateRound();
+    }
+})
 
 function rosterScreen() {
     hideAllScreens();
@@ -366,6 +402,9 @@ function standingsScreen() {
                     const teamDiv = document.createElement("div");
                     document.getElementById(conference + "-standings").append(teamDiv);
                     teamDiv.innerHTML = `${i}. ${team} (${teams[conference][team].overall} ovr) (${teams[conference][team].wins}-${teams[conference][team].losses})`;
+                    if (teams[conference][team].name === userSelectedTeam) {
+                        teamDiv.style.fontWeight = "bold";
+                    }
                 }
             }
         }
@@ -402,6 +441,9 @@ function scheduleScreen() {
                 const matchup = document.createElement("div");
                 matchup.innerHTML = `${team1} ${record1} vs. ${team2} ${record2}`;
                 document.getElementById(conference + "-schedule").append(matchup);
+                if (team1 === userSelectedTeam || team2 === userSelectedTeam) {
+                    matchup.style.fontWeight = "bold";
+                }
             }
         }
     } else {
@@ -412,7 +454,7 @@ function scheduleScreen() {
 function bracketScreen() {
     hideAllScreens();
     document.getElementById("btn-menu-container").style.display = "block";
-    document.getElementById("bracket-screen-container").style.display = "block";
+    document.getElementById("bracket-screen-container").style.display = "flex";
     document.getElementById("bracket-screen-container").innerHTML = "";
     for (const round in bracketMatchups) {
         if (round !== "round") {
@@ -440,6 +482,9 @@ function bracketScreen() {
                     teamDiv2.className = "bracket-team-bottom";
                     teamDiv1.innerHTML = `${bracketMatchups[round][i][0].standing}. ${bracketMatchups[round][i][0].name} (${bracketMatchups[round][i][0].overall} ovr)`;
                     teamDiv2.innerHTML = `${bracketMatchups[round][i][1].standing}. ${bracketMatchups[round][i][1].name} (${bracketMatchups[round][i][1].overall} ovr)`;
+                    if (bracketMatchups[round][i][0].name === userSelectedTeam || bracketMatchups[round][i][1].name === userSelectedTeam) {
+                        matchupDiv.style.fontWeight = "bold";
+                    }
                     document.getElementById("round-" + round + "-section").append(matchupDiv);
                     document.getElementById("round-" + round + "-matchup-" + (i + 1)).append(teamDiv1);
                     document.getElementById("round-" + round + "-matchup-" + (i + 1)).append(teamDiv2);
