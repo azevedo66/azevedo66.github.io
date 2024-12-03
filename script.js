@@ -2,19 +2,6 @@ let userSelectedTeam;
 
 const teams = {};
 
-
-const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
-"Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
-"Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
-"Reese", "Darin", "Lamont", "Vernon", "Vincent", "Brodie", "Ray", "Bradley", "David", "Keith", "Jamal", 
-"Dylan", "Edward", "Seth", "Stephon", "Shayne"];
-
-const lastNames = ["House", "Prewitt", "Burden", "Larsen", "Key", "Mancuso", "Horn", "Hanes", "Coley", "Nettles", 
-"Ventura", "Smith", "Croft", "Samples", "Kaminski", "White", "Green", "Foley", "Phelps", "Barney", "Coffey", 
-"Fuller", "Farnsworth", "Wilburn", "Espino", "Snell", "Allan", "Reaves", "Brockman", "Kelley", "Boyer", "Harman", 
-"Meadows", "Hensley", "Mcmillen", "Jacobs", "Leblanc", "Akins", "Cornett", "Maxey", "Rubin", "Moses", "Conway", 
-"Gates", "Christie", "Whalen", "Lawson", "Clary", "Beckett", "Keener"];
-
 const conferenceTeams = {
     north: ["Aliens", "Astronauts", "Blizzards", "Crabs", "Defenders", "Dragons", "Eagles", "Hammers", "Ogres", "Riot", "Rocks", "Stars", "Tigers", "Volcanoes", "Wind", "Zombies"],
     east: ["Bears", "Beavers", "Dribblers", "Fighters", "Flames", "Gnomes", "Ice", "Mustangs", "Sailors", "Skeletons", "Tornadoes", "Troopers", "Wasps", "Wings", "Wizards", "Wolves"],
@@ -75,65 +62,45 @@ class Player {
 }
 
 function createRandomPlayer(position, year, role) {
-    function generateFirstName() {
-        const randomIndex = Math.floor(Math.random() * firstNames.length);
-        return firstNames[randomIndex];
-    }
-    
-    function generateLastName() {
-        const randomIndex = Math.floor(Math.random() * lastNames.length);
-        return lastNames[randomIndex];
-    }
-    
-    function generateHeight(position) {
-        const randomIndex = Math.floor(Math.random() * 5);
-        if (position === "Point Guard") {
-            const heights = ["5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""];
-            return heights[randomIndex];
-        } else if (position === "Shooting Guard") {
-            const heights = ["6'3\"", "6'4\"", "6'5\"", "6'6\"", "6'7\""];
-            return heights[randomIndex];
-        } else if (position === "Small Forward") {
-            const heights = ["6'5\"", "6'6\"", "6'7\"", "6'8\"", "6'9\""];
-            return heights[randomIndex];
-        } else if (position === "Power Forward") {
-            const heights = ["6'7\"", "6'8\"", "6'9\"", "6'10\"", "6'11\""];
-            return heights[randomIndex];
-        } else if (position === "Center") {
-            const heights = ["6'9\"", "6'10\"", "6'11\"", "7'0\"", "7'1\"", "7'2\"", "7'3\""];
-            return heights[randomIndex];
-        }
-    }
+    const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
+"Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
+"Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
+"Reese", "Darin", "Lamont", "Vernon", "Vincent", "Brodie", "Ray", "Bradley", "David", "Keith", "Jamal", 
+"Dylan", "Edward", "Seth", "Stephon", "Shayne"];
 
-    function generateWeight(position) {
-        const randomIndex = Math.floor(Math.random() * 5);
-        if (position === "Point Guard") {
-            const weights = [160, 165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220];
-            return weights[randomIndex];
-        } else if (position === "Shooting Guard") {
-            const weights = [200, 205, 210, 215, 220, 225, 230];
-            return weights[randomIndex];
-        } else if (position === "Small Forward") {
-            const weights = [220, 225, 230, 235, 240, 245];
-            return weights[randomIndex];
-        } else if (position === "Power Forward") {
-            const weights = [240, 245, 250, 255, 260];
-            return weights[randomIndex];
-        } else if (position === "Center") {
-            const weights = [250, 255, 260, 265, 270, 275, 280, 285, 290, 295, 300];
-            return weights[randomIndex];
-        }
+    const lastNames = ["House", "Prewitt", "Burden", "Larsen", "Key", "Mancuso", "Horn", "Hanes", "Coley", "Nettles", 
+"Ventura", "Smith", "Croft", "Samples", "Kaminski", "White", "Green", "Foley", "Phelps", "Barney", "Coffey", 
+"Fuller", "Farnsworth", "Wilburn", "Espino", "Snell", "Allan", "Reaves", "Brockman", "Kelley", "Boyer", "Harman", 
+"Meadows", "Hensley", "Mcmillen", "Jacobs", "Leblanc", "Akins", "Cornett", "Maxey", "Rubin", "Moses", "Conway", 
+"Gates", "Christie", "Whalen", "Lawson", "Clary", "Beckett", "Keener"];  
+
+    const heights = {
+        "Point Guard": ["5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""],
+        "Shooting Guard": ["6'3\"", "6'4\"", "6'5\"", "6'6\"", "6'7\""],
+        "Small Forward": ["6'5\"", "6'6\"", "6'7\"", "6'8\"", "6'9\""],
+        "Power Forward": ["6'7\"", "6'8\"", "6'9\"", "6'10\"", "6'11\""],
+        "Center": ["6'9\"", "6'10\"", "6'11\"", "7'0\"", "7'1\"", "7'2\"", "7'3\""]
+    };
+
+    const weights = {
+        "Point Guard": [160, 165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220],
+        "Shooting Guard": [200, 205, 210, 215, 220, 225, 230],
+        "Small Forward": [220, 225, 230, 235, 240, 245],
+        "Power Forward": [240, 245, 250, 255, 260],
+        "Center": [250, 255, 260, 265, 270, 275, 280, 285, 290, 295, 300]
+    };
+
+    function getRandomElement(array) {
+        return array[Math.floor(Math.random() * array.length)];
     }
 
     function generateOverall(role) {
-        if (role === "starter") {
-            return Math.floor(Math.random() * (99 - 75) + 75);
-        } else if (role === "bench") {
-            return Math.floor(Math.random() * (75 - 60) + 60);
-        }
+        const range = role === "starter" ? [75, 99] : role === "bench" ? [60, 75] : [0, 0];
+        return Math.floor(Math.random() * (range[1] - range[0]) + range[0]);
     }
 
-    const player = new Player(generateFirstName(), generateLastName(), position, generateHeight(position), generateWeight(position), generateOverall(role), year);
+    const player = new Player(getRandomElement(firstNames), getRandomElement(lastNames), position, getRandomElement(heights[position]), getRandomElement(weights[position]), generateOverall(role), year);
+
     return player;
 }
 
