@@ -182,6 +182,8 @@ function orderStandings() {
 function simulateGame(team1, team2) {
     const starterPossessions = 50;
     const benchPossessions = 25;
+    const minFgPercentage = 40;
+
     let teamScore1 = 0;
     let teamScore2 = 0;
 
@@ -194,14 +196,13 @@ function simulateGame(team1, team2) {
             const randomPlayerIndex = Math.floor(Math.random() * team.bench.length);
             player = team.bench[randomPlayerIndex];
         }
-        const points = simulatePlayerScore(player);
-        return points;
+
+        return simulatePlayerScore(player);
     }
 
     function simulatePlayerScore(player) {
         const randomNum = Math.random() * 100;
-        const minFgPercentage = 40;
-        const playerFgPercentage = ((player - 69) * 0.5) + minFgPercentage;
+        const playerFgPercentage = minFgPercentage + (player.overall / 100) * (100 - minFgPercentage);
         if (randomNum < playerFgPercentage) {
             const pointAmountNum = Math.random() * 100;
             if (pointAmountNum < 70) {
@@ -215,30 +216,48 @@ function simulateGame(team1, team2) {
     }
 
     for (let i = 0; i < starterPossessions; i++) {
-        const possession1 = simulatePossession(team1, "starters");
-        const possession2 = simulatePossession(team2, "starters");
-        teamScore1 += possession1;
-        teamScore2 += possession2;
+        teamScore1 += simulatePossession(team1, "starters");
+        teamScore2 += simulatePossession(team2, "starters");
     }
 
     for (let i = 0; i < benchPossessions; i++) {
-        const possession1 = simulatePossession(team1, "bench");
-        const possession2 = simulatePossession(team2, "bench");
-        teamScore1 += possession1;
-        teamScore2 += possession2;
+        teamScore1 += simulatePossession(team1, "bench");
+        teamScore2 += simulatePossession(team2, "bench");
     }
 
-    if (teamScore1 > teamScore2) {
-        return team1;
-    } else if (teamScore2 > teamScore1) {
-        return team2;
-    } else {
-        const randomWinner = Math.floor(Math.random());
-        if (randomWinner === 1) {
-            return team1;
-        } else {
-            return team2;
+   while (teamScore1 === teamScore2) {
+    teamScore1 += simulatePossession(team1, "starters");
+    teamScore2 += simulatePossession(team2, "starters");
+   }
+
+   return teamScore1 > teamScore2 ? team1 : team2;
+}
+
+function simulateRegularSeasonGame() {
+    if (schedule.day <= 16) {
+        const day = schedule.day.toString();
+        for (const conference in teams) {
+            for (let i = 0; i < schedule[day].length; i++) {
+                let team1, team2;
+                for (const team in teams[conference]) {
+                    if (teams[conference][team].teamNum === schedule[day][i][0]) {
+                        team1 = teams[conference][team];
+                    } else if (teams[conference][team].teamNum === schedule[day][i][1]) {
+                        team2 = teams[conference][team];
+                    }
+                }
+                const winner = simulateGame(team1, team2);
+                if (winner.name === team1.name) {
+                    teams[conference][team1.name].wins += 1;
+                    teams[conference][team2.name].losses += 1;
+                } else if (winner.name === team2.name) {
+                    teams[conference][team1.name].losses += 1;
+                    teams[conference][team2.name].wins += 1;
+                }
+            }
         }
+        schedule.day += 1;
+        standingsScreen();
     }
 }
 
