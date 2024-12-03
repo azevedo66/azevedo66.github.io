@@ -159,20 +159,18 @@ function createLeague() {
 
 function orderStandings() {
     for (const conference in teams) {
-        const teamsArr = [];
-        for (const team in teams[conference]) {
-            teamsArr.push({name: teams[conference][team].name, wins: teams[conference][team].wins, standing: teams[conference][team].standing});
-        }
-        teamsArr.sort(function(a, b) {
-            return b.wins - a.wins;
+        const teamsArr = Object.values(teams[conference]).map(team => ({
+            name: team.name,
+            wins: team.wins,
+            standing: team.standing
+        }));
+
+        teamsArr.sort((a, b) => b.wins - a.wins);
+
+        teamsArr.forEach((team, index) => {
+            const teamObj = teams[conference][team.name];
+            teamObj.standing = index + 1;
         });
-        for (let i = 1; i < teamsArr.length + 1; i++) {
-            for (const team in teams[conference]) {
-                if (teams[conference][team].name === teamsArr[i - 1].name) {
-                    teams[conference][team].standing = i;
-                }
-            }
-        }
     }
 }
 
