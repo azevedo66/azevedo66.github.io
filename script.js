@@ -33,8 +33,6 @@ const bracketMatchups = {
     round: 0
 };
 
-const firstRoundMatchups = [[1, 16], [8, 9], [5, 12], [4, 13], [6, 11], [3, 14], [7, 10], [2, 15]];
-
 class Team {
     constructor(name, conference, wins, losses, standing, overall, teamNum, starters, bench) {
         this.name = name;
@@ -119,20 +117,24 @@ function createLeague() {
     function generateTeamPlayers() {
         const starters = [];
         const bench = [];
+
         for (const position of positions) {
             const randomYear1 = years[Math.floor(Math.random() * years.length)];
             const randomYear2 = years[Math.floor(Math.random() * years.length)];
-            starters.push(createRandomPlayer(position, randomYear2, "starter"));
+            starters.push(createRandomPlayer(position, randomYear1, "starter"));
             bench.push(createRandomPlayer(position, randomYear2, "bench"));
         }
+
         return { starters, bench };
     }
 
     function calculateTeamOverall(starters, bench) {
         let overallSum = 0;
+
         for (const player of [...starters, ...bench]) {
             overallSum += player.overall;
         }
+
         return Math.round((overallSum + 70) / 10);
     }
 
@@ -152,6 +154,7 @@ function createLeague() {
                 starters,
                 bench
             );
+
             teams[conference][teamName] = team;
         });
     }
@@ -220,10 +223,10 @@ function simulateGame(team1, team2) {
         teamScore2 += simulatePossession(team2, "bench");
     }
 
-   while (teamScore1 === teamScore2) {
-    teamScore1 += simulatePossession(team1, "starters");
-    teamScore2 += simulatePossession(team2, "starters");
-   }
+    while (teamScore1 === teamScore2) {
+        teamScore1 += simulatePossession(team1, "starters");
+        teamScore2 += simulatePossession(team2, "starters");
+    }
 
    return teamScore1 > teamScore2 ? team1 : team2;
 }
@@ -232,12 +235,14 @@ function simulateRegularSeasonGame() {
     if (schedule.day <= 16) {
         const day = schedule.day.toString();
         const dayGames = schedule[day];
+
         for (const conference in teams) {
             dayGames.forEach(game => {
                 const [team1Num, team2Num] = game;
                 const team1 = Object.values(teams[conference]).find(team => team.teamNum === team1Num);
                 const team2 = Object.values(teams[conference]).find(team => team.teamNum === team2Num);
                 const winner = simulateGame(team1, team2);
+
                 if (winner.name === team1.name) {
                     team1.wins += 1;
                     team2.losses += 1;
@@ -247,6 +252,7 @@ function simulateRegularSeasonGame() {
                 }
             })
         }
+
         schedule.day += 1;
         standingsScreen();
     } else if (schedule.day === 17) {
@@ -282,12 +288,14 @@ function simulateRound() {
     bracketMatchups.round += 1;
 
     bracketScreen();
-    console.log(bracketMatchups);
 }
 
 function createBracketMatchups() {
+    const firstRoundMatchups = [[1, 16], [8, 9], [5, 12], [4, 13], [6, 11], [3, 14], [7, 10], [2, 15]];
+
     if (bracketMatchups.round === 1) {
         const roundMatchups = [];
+
         for (const conference in teams) {
             firstRoundMatchups.forEach(([standing1, standing2]) => {
                 const team1 = Object.values(teams[conference]).find(team => team.standing === standing1);
@@ -295,6 +303,7 @@ function createBracketMatchups() {
                 roundMatchups.push([team1, team2]);
             });
         }
+
         bracketMatchups[1] = roundMatchups;
     }
 }
@@ -302,6 +311,7 @@ function createBracketMatchups() {
 function selectTeamScreen() {
     const selectTeamDropdown = document.getElementById("selectTeamDropdown");
     let index = 1;
+
     for (const conference in conferenceTeams) {
         for (let i = 0; i < conferenceTeams[conference].length; i++) {
             const teamOption = document.createElement("option");
@@ -320,6 +330,7 @@ function rosterScreen() {
     document.getElementById("starters-container").innerHTML = "";
     document.getElementById("bench-container").innerHTML = "";
     document.getElementById("roster-screen-team-name").innerHTML = userSelectedTeam;
+
     for (const conference in teams) {
         for (const team in teams[conference]) {
             if (team === userSelectedTeam) {
@@ -329,6 +340,7 @@ function rosterScreen() {
                     document.getElementById("starters-container").append(playerDiv);
                     playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight}`;
                 }
+
                 for (let i = 0; i < teams[conference][team]["bench"].length; i++) {
                     const player = teams[conference][team]["bench"][i];
                     const playerDiv = document.createElement("div");
@@ -346,6 +358,7 @@ function standingsScreen() {
     document.getElementById("btn-menu-container").style.display = "block";
     document.getElementById("standings-screen-container").style.display = "flex";
     document.getElementById("standings-screen-container").innerHTML = "";
+
     for (const conference in teams) {
         const conferenceDiv = document.createElement("div");
         const conferenceTitle = document.createElement("div");
@@ -362,6 +375,7 @@ function standingsScreen() {
                     const teamDiv = document.createElement("div");
                     document.getElementById(conference + "-standings").append(teamDiv);
                     teamDiv.innerHTML = `${i}. ${team} (${teams[conference][team].overall} ovr) (${teams[conference][team].wins}-${teams[conference][team].losses})`;
+
                     if (teams[conference][team].name === userSelectedTeam) {
                         teamDiv.style.fontWeight = "bold";
                     }
@@ -376,6 +390,7 @@ function scheduleScreen() {
     document.getElementById("btn-menu-container").style.display = "block";
     document.getElementById("schedule-screen-container").style.display = "block";
     document.getElementById("schedule-screen-container").innerHTML = "";
+
     if (schedule.day <= 16) {
         const day = schedule.day.toString();
         for (const conference in teams) {
@@ -398,9 +413,11 @@ function scheduleScreen() {
                         record2 = `(${teams[conference][team].wins}-${teams[conference][team].losses})`;
                     }
                 }
+
                 const matchup = document.createElement("div");
                 matchup.innerHTML = `${team1} ${record1} vs. ${team2} ${record2}`;
                 document.getElementById(conference + "-schedule").append(matchup);
+                
                 if (team1 === userSelectedTeam || team2 === userSelectedTeam) {
                     matchup.style.fontWeight = "bold";
                 }
@@ -482,15 +499,14 @@ document.getElementById("selectTeamForm").addEventListener("submit", function (e
     userSelectedTeam = selectTeamDropdown.value;
     createLeague();
     rosterScreen();
-    console.log(teams);
 });
 
 document.getElementById("sim-btn").addEventListener("click", function (event) {
     if (schedule.day <= 17) {
         simulateRegularSeasonGame();
-    } else {
+    } else if (!bracketMatchups.champion) {
         simulateRound();
     }
-})
+});
 
 selectTeamScreen();
