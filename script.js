@@ -63,16 +63,16 @@ class Player {
 
 function createRandomPlayer(position, year, role) {
     const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
-"Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
-"Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
-"Reese", "Darin", "Lamont", "Vernon", "Vincent", "Brodie", "Ray", "Bradley", "David", "Keith", "Jamal", 
-"Dylan", "Edward", "Seth", "Stephon", "Shayne"];
+        "Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
+        "Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
+        "Reese", "Darin", "Lamont", "Vernon", "Vincent", "Brodie", "Ray", "Bradley", "David", "Keith", "Jamal", 
+        "Dylan", "Edward", "Seth", "Stephon", "Shayne"];
 
     const lastNames = ["House", "Prewitt", "Burden", "Larsen", "Key", "Mancuso", "Horn", "Hanes", "Coley", "Nettles", 
-"Ventura", "Smith", "Croft", "Samples", "Kaminski", "White", "Green", "Foley", "Phelps", "Barney", "Coffey", 
-"Fuller", "Farnsworth", "Wilburn", "Espino", "Snell", "Allan", "Reaves", "Brockman", "Kelley", "Boyer", "Harman", 
-"Meadows", "Hensley", "Mcmillen", "Jacobs", "Leblanc", "Akins", "Cornett", "Maxey", "Rubin", "Moses", "Conway", 
-"Gates", "Christie", "Whalen", "Lawson", "Clary", "Beckett", "Keener"];  
+        "Ventura", "Smith", "Croft", "Samples", "Kaminski", "White", "Green", "Foley", "Phelps", "Barney", "Coffey", 
+        "Fuller", "Farnsworth", "Wilburn", "Espino", "Snell", "Allan", "Reaves", "Brockman", "Kelley", "Boyer", "Harman", 
+        "Meadows", "Hensley", "Mcmillen", "Jacobs", "Leblanc", "Akins", "Cornett", "Maxey", "Rubin", "Moses", "Conway", 
+        "Gates", "Christie", "Whalen", "Lawson", "Clary", "Beckett", "Keener"];  
 
     const heights = {
         "Point Guard": ["5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""],
@@ -99,38 +99,61 @@ function createRandomPlayer(position, year, role) {
         return Math.floor(Math.random() * (range[1] - range[0]) + range[0]);
     }
 
-    const player = new Player(getRandomElement(firstNames), getRandomElement(lastNames), position, getRandomElement(heights[position]), getRandomElement(weights[position]), generateOverall(role), year);
+    const player = new Player(
+        getRandomElement(firstNames), 
+        getRandomElement(lastNames), 
+        position, 
+        getRandomElement(heights[position]), 
+        getRandomElement(weights[position]), 
+        generateOverall(role), 
+        year
+    );
 
     return player;
 }
 
 function createLeague() {
-    for (const conference in conferenceTeams) {
-        teams[conference] = {};
-        for (let i = 0; i < conferenceTeams[conference].length; i++) {
-            const starters = [];
-            const bench = [];
-            const positions = ["Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
-            const years = ["Freshman", "Sophomore", "Junior", "Senior"];
-            for (let i = 0; i < positions.length; i++) {
-                const randomYearIndex1 = Math.floor(Math.random() * years.length);
-                const randomYearIndex2 = Math.floor(Math.random() * years.length);
-                const starterPlayer = createRandomPlayer(positions[i], years[randomYearIndex1], "starter");
-                const benchPlayer = createRandomPlayer(positions[i], years[randomYearIndex2], "bench");
-                starters.push(starterPlayer);
-                bench.push(benchPlayer);
-            }
-            let overallSum = 0;
-            for (let i = 0; i < 5; i++) {
-                overallSum += starters[i].overall;
-                overallSum += bench[i].overall;
-            }
-            const teamOverall = Math.round((overallSum + 70) / 10);
-            const teamName = conferenceTeams[conference][i];
-            const conferenceName = conference;
-            const team = new Team(teamName, conferenceName, 0, 0, i + 1, teamOverall, i + 1, starters, bench);
-            teams[conference][conferenceTeams[conference][i]] = team;
+    const positions = ["Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
+    const years = ["Freshman", "Sophomore", "Junior", "Senior"];
+
+    function generateTeamPlayers() {
+        const starters = [];
+        const bench = [];
+        for (const position of positions) {
+            const randomYear1 = years[Math.floor(Math.random() * years.length)];
+            const randomYear2 = years[Math.floor(Math.random() * years.length)];
+            starters.push(createRandomPlayer(position, randomYear2, "starter"));
+            bench.push(createRandomPlayer(position, randomYear2, "bench"));
         }
+        return { starters, bench };
+    }
+
+    function calculateTeamOverall(starters, bench) {
+        let overallSum = 0;
+        for (const player of [...starters, ...bench]) {
+            overallSum += player.overall;
+        }
+        return Math.round((overallSum + 70) / 10);
+    }
+
+    for (const conference in conferenceTeams) {
+        teams[conference] = {}; 
+        conferenceTeams[conference].forEach((teamName, index) => {
+            const { starters, bench } = generateTeamPlayers();
+            const teamOverall = calculateTeamOverall(starters, bench);
+            const team = new Team(
+                teamName,
+                conference,
+                0,
+                0,
+                index + 1,
+                teamOverall,
+                index + 1,
+                starters,
+                bench
+            );
+            teams[conference][teamName] = team;
+        });
     }
 }
 
