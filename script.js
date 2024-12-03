@@ -477,6 +477,7 @@ function bracketScreen() {
         championTitle.innerHTML = "Champion";
         const championDiv = document.createElement("div");
         const champion = bracketMatchups.champion;
+        championDiv.id = "champion";
         championDiv.innerHTML = `${champion.standing}. ${champion.name} (${champion.overall} ovr)`;
         container.append(championSection);
         championSection.append(championTitle);
