@@ -1,3 +1,40 @@
 #btn-menu-container, #roster-screen-container, #standings-screen-container, #schedule-screen-container {
     display: none;
 }
+
+#standings-screen-container {
+    display: flex;
+    justify-content: center;
+}
+
+.conference-title-standings {
+    text-transform: capitalize;
+    font-weight: bold;
+    text-align: center;
+}
+
+#bracket-screen-container {
+    display: flex;
+    justify-content: left;
+}
+
+.bracket-matchup, .champion {
+    background: grey;
+    padding: 5px; 
+    margin: 5px;
+    border: 2px solid black;
+    max-width: 200px;
+}
+
+.bracket-team-top {
+    border-bottom: 2px solid black;
+}
+
+.bracket-team-bottom {
+    border-top: 2px solid black;
+}
+
+#standings-title, #schedule-title {
+    text-align: center;
+    font-weight: bold;
+}

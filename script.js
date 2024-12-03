@@ -2,6 +2,7 @@ let userSelectedTeam;
 
 const teams = {};
 
+
 const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
 "Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
 "Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
@@ -40,6 +41,12 @@ const schedule = {
     15: [[2, 14], [5, 11], [3, 13], [4, 12], [8, 9], [1, 16], [7, 10]],
     16: [[2, 15], [6, 11], [3, 14], [5, 12], [4, 13]] 
 };
+
+const bracketMatchups = {
+    round: 0
+};
+
+const firstRoundMatchups = [[1, 16], [8, 9], [5, 12], [4, 13], [6, 11], [3, 14], [7, 10], [2, 15]];
 
 class Team {
     constructor(name, conference, wins, losses, standing, overall, teamNum, starters, bench) {
@@ -258,6 +265,32 @@ function simulateRegularSeasonGame() {
         }
         schedule.day += 1;
         standingsScreen();
+    } else if (schedule.day === 17) {
+        bracketMatchups.round += 1;
+        schedule.day += 1;
+        createBracketMatchups();
+        bracketScreen();
+    }
+}
+
+function createBracketMatchups() {
+    if (bracketMatchups.round === 1) {
+        const roundMatchups = [];
+        for (const conference in teams) {
+            for (let i = 0; i < firstRoundMatchups.length; i++) {
+                let team1, team2;
+                for (const team in teams[conference]) {
+                    if (teams[conference][team].standing === firstRoundMatchups[i][0]) {
+                        team1 = teams[conference][team];
+                    } else if (teams[conference][team].standing === firstRoundMatchups[i][1]) {
+                        team2 = teams[conference][team];
+                    }
+                }
+                roundMatchups.push([team1, team2]);
+            }
+        }
+        bracketMatchups[1] = roundMatchups;
+        console.log(bracketMatchups);
     }
 }
 
@@ -315,13 +348,14 @@ function standingsScreen() {
     hideAllScreens();
     orderStandings();
     document.getElementById("btn-menu-container").style.display = "block";
-    document.getElementById("standings-screen-container").style.display = "block";
+    document.getElementById("standings-screen-container").style.display = "flex";
     document.getElementById("standings-screen-container").innerHTML = "";
     for (const conference in teams) {
         const conferenceDiv = document.createElement("div");
         const conferenceTitle = document.createElement("div");
         conferenceDiv.id = conference + "-standings";
         conferenceTitle.id = conference + "-title-standings";
+        conferenceDiv.className = "conference-section-standings";
         conferenceTitle.className = "conference-title-standings";
         conferenceTitle.innerHTML = conference;
         document.getElementById("standings-screen-container").append(conferenceDiv);
@@ -375,13 +409,58 @@ function scheduleScreen() {
     }
 }
 
+function bracketScreen() {
+    hideAllScreens();
+    document.getElementById("btn-menu-container").style.display = "block";
+    document.getElementById("bracket-screen-container").style.display = "block";
+    document.getElementById("bracket-screen-container").innerHTML = "";
+    for (const round in bracketMatchups) {
+        if (round !== "round") {
+            const roundSection = document.createElement("div");
+            const roundTitle = document.createElement("div");
+            roundSection.id = "round-" + round + "-section";
+            roundTitle.id = "round-" + round + "-title";
+            if (round > 6) {
+                roundTitle.innerHTML = "Champion";
+            } else {
+                roundTitle.innerHTML = `Round ${round}`;
+            }
+            document.getElementById("bracket-screen-container").append(roundSection);
+            document.getElementById("round-" + round + "-section").append(roundTitle);
+            for (let i = 0; i < bracketMatchups[round].length; i++) {
+                if (round <= 6) {
+                    const matchupDiv = document.createElement("div");
+                    const teamDiv1 = document.createElement("div");
+                    const teamDiv2 = document.createElement("div");
+                    matchupDiv.id = "round-" + round + "-matchup-" + (i + 1);
+                    teamDiv1.id = "round-" + round + "-matchup-" + (i + 1) + "-team-1";
+                    teamDiv2.id = "round-" + round + "-matchup-" + (i + 1) + "-team-2";
+                    matchupDiv.className = "bracket-matchup";
+                    teamDiv1.className = "bracket-team-top";
+                    teamDiv2.className = "bracket-team-bottom";
+                    teamDiv1.innerHTML = `${bracketMatchups[round][i][0].standing}. ${bracketMatchups[round][i][0].name} (${bracketMatchups[round][i][0].overall} ovr)`;
+                    teamDiv2.innerHTML = `${bracketMatchups[round][i][1].standing}. ${bracketMatchups[round][i][1].name} (${bracketMatchups[round][i][1].overall} ovr)`;
+                    document.getElementById("round-" + round + "-section").append(matchupDiv);
+                    document.getElementById("round-" + round + "-matchup-" + (i + 1)).append(teamDiv1);
+                    document.getElementById("round-" + round + "-matchup-" + (i + 1)).append(teamDiv2);
+                } else {
+                    const teamDiv = document.createElement("div");
+                    teamDiv.id = "champion";
+                    teamDiv.innerHTML = `${bracketMatchups[round][i].standing}. ${bracketMatchups[round][i].name} (${bracketMatchups[round][i].overall} ovr)`;
+                    document.getElementById("round-" + round + "-section").append(teamDiv);
+                }
+            }
+        }
+    }
+}
+
 function hideAllScreens() {
     document.getElementById("start-screen-container").style.display = "none";
     document.getElementById("btn-menu-container").style.display = "none";
     document.getElementById("roster-screen-container").style.display = "none";
     document.getElementById("standings-screen-container").style.display = "none";
     document.getElementById("schedule-screen-container").style.display = "none";
-
+    document.getElementById("bracket-screen-container").style.display = "none";
 }
 
 selectTeamScreen();
