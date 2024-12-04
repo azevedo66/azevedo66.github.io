@@ -1,4 +1,4 @@
-#btn-menu-container, #roster-screen-container, #standings-screen-container, #schedule-screen-container, #graduating-players-screen-container {
+#btn-menu-container, #roster-screen-container, #standings-screen-container, #schedule-screen-container, #graduating-players-screen-container, #scout-players-screen-container {
     display: none;
 }
 
@@ -38,3 +38,15 @@
     text-align: center;
     font-weight: bold;
 }
+
+.scouting-position-container {
+    display: inline-block;
+}
+
+.player-section-scouting, .position-title-scouting {
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+

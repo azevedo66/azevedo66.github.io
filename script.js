@@ -2,9 +2,48 @@ let userSelectedTeam;
 
 let regularSeasonDay = 1, tournamentRound = 0, offseasonWeek = 0;
 
+let scoutingHours = 300;
+let scholarshipsRemaining = 10;
+
 const teams = {};
 
+let prospectsList = {};
+
+let acceptedPlayers = [];
+
 let bracketMatchups = {};
+
+const positions = ["Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
+
+const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
+        "Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
+        "Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
+        "Reese", "Darin", "Lamont", "Vernon", "Vincent", "Brodie", "Ray", "Bradley", "David", "Keith", "Jamal", 
+        "Dylan", "Edward", "Seth", "Stephon", "Shayne"
+];
+
+const lastNames = ["House", "Prewitt", "Burden", "Larsen", "Key", "Mancuso", "Horn", "Hanes", "Coley", "Nettles", 
+        "Ventura", "Smith", "Croft", "Samples", "Kaminski", "White", "Green", "Foley", "Phelps", "Barney", "Coffey", 
+        "Fuller", "Farnsworth", "Wilburn", "Espino", "Snell", "Allan", "Reaves", "Brockman", "Kelley", "Boyer", "Harman", 
+        "Meadows", "Hensley", "Mcmillen", "Jacobs", "Leblanc", "Akins", "Cornett", "Maxey", "Rubin", "Moses", "Conway", 
+        "Gates", "Christie", "Whalen", "Lawson", "Clary", "Beckett", "Keener"
+];
+
+const heights = {
+    "Point Guard": ["5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""],
+    "Shooting Guard": ["6'3\"", "6'4\"", "6'5\"", "6'6\"", "6'7\""],
+    "Small Forward": ["6'5\"", "6'6\"", "6'7\"", "6'8\"", "6'9\""],
+    "Power Forward": ["6'7\"", "6'8\"", "6'9\"", "6'10\"", "6'11\""],
+    "Center": ["6'9\"", "6'10\"", "6'11\"", "7'0\"", "7'1\"", "7'2\"", "7'3\""]
+};
+
+const weights = {
+    "Point Guard": [160, 165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220],
+    "Shooting Guard": [200, 205, 210, 215, 220, 225, 230],
+    "Small Forward": [220, 225, 230, 235, 240, 245],
+    "Power Forward": [240, 245, 250, 255, 260],
+    "Center": [250, 255, 260, 265, 270, 275, 280, 285, 290, 295, 300]
+};
 
 const conferenceTeams = {
     north: ["Aliens", "Astronauts", "Blizzards", "Crabs", "Defenders", "Dragons", "Eagles", "Hammers", "Ogres", "Riot", "Rocks", "Stars", "Tigers", "Volcanoes", "Wind", "Zombies"],
@@ -60,40 +99,12 @@ class Player {
 }
 
 function createRandomPlayer(position, year, role) {
-    const firstNames = ["Kenyon", "Will", "Zachary", "Martin", "Jeffery", "Brian", "Devon", "Steven", "Benny", "Nathan", 
-        "Mathhew", "Ben", "Benjamin", "Jim", "Wayne", "Jacob", "Jake", "Glen", "Elliot", "Stewart", "Isaac", "Tim", 
-        "Coby", "Brad", "Jeremy", "Melvin", "Tyrek", "Jerrod", "Philip", "Tony", "Jaeden", "Mark", "Alex", "Neal", 
-        "Reese", "Darin", "Lamont", "Vernon", "Vincent", "Brodie", "Ray", "Bradley", "David", "Keith", "Jamal", 
-        "Dylan", "Edward", "Seth", "Stephon", "Shayne"];
-
-    const lastNames = ["House", "Prewitt", "Burden", "Larsen", "Key", "Mancuso", "Horn", "Hanes", "Coley", "Nettles", 
-        "Ventura", "Smith", "Croft", "Samples", "Kaminski", "White", "Green", "Foley", "Phelps", "Barney", "Coffey", 
-        "Fuller", "Farnsworth", "Wilburn", "Espino", "Snell", "Allan", "Reaves", "Brockman", "Kelley", "Boyer", "Harman", 
-        "Meadows", "Hensley", "Mcmillen", "Jacobs", "Leblanc", "Akins", "Cornett", "Maxey", "Rubin", "Moses", "Conway", 
-        "Gates", "Christie", "Whalen", "Lawson", "Clary", "Beckett", "Keener"];  
-
-    const heights = {
-        "Point Guard": ["5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""],
-        "Shooting Guard": ["6'3\"", "6'4\"", "6'5\"", "6'6\"", "6'7\""],
-        "Small Forward": ["6'5\"", "6'6\"", "6'7\"", "6'8\"", "6'9\""],
-        "Power Forward": ["6'7\"", "6'8\"", "6'9\"", "6'10\"", "6'11\""],
-        "Center": ["6'9\"", "6'10\"", "6'11\"", "7'0\"", "7'1\"", "7'2\"", "7'3\""]
-    };
-
-    const weights = {
-        "Point Guard": [160, 165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220],
-        "Shooting Guard": [200, 205, 210, 215, 220, 225, 230],
-        "Small Forward": [220, 225, 230, 235, 240, 245],
-        "Power Forward": [240, 245, 250, 255, 260],
-        "Center": [250, 255, 260, 265, 270, 275, 280, 285, 290, 295, 300]
-    };
-
     function getRandomElement(array) {
         return array[Math.floor(Math.random() * array.length)];
     }
 
     function generateOverall(role) {
-        const range = role === "starter" ? [75, 99] : role === "bench" ? [60, 75] : [0, 0];
+        const range = role === "starter" ? [75, 99] : role === "bench" ? [60, 75] : role === "prospect" ? [60, 99] : [0, 0];
         return Math.floor(Math.random() * (range[1] - range[0]) + range[0]);
     }
 
@@ -325,6 +336,47 @@ function removeGraduatingPlayers() {
     });
 }
 
+function generateProspects() {
+    const numberOfPositions = 5;
+    const prospectsPerPosition = 20;
+
+    for (let i = 0; i < numberOfPositions; i++) {
+        const positionList = [];
+        const position = positions[i];
+        for (let j = 0; j < prospectsPerPosition; j++) {
+            const player = createRandomPlayer(position, "Freshman", "prospect");
+            const scoutedOverall = "?";
+            const scoutingTrips = 0;
+            const playerNum = j;
+            positionList.push([player, playerNum, scoutedOverall, scoutingTrips]);
+        }
+
+        prospectsList[position] = positionList;
+    }
+}
+
+function scoutProspect(player, playerNum) {
+    const actualOverall = player.overall;
+    const maxScoutingTrips = 5;
+    const position = player.position;
+    const scoutingTrips = prospectsList[position][playerNum][3];
+
+    if (scoutingTrips <= maxScoutingTrips) {
+        const narrowing = Math.max(1, Math.floor((99 - 60) / (2 * (scoutingTrips + 1))));
+        const lowerBound = Math.max(actualOverall - narrowing, 60);
+        const upperBound = Math.min(actualOverall + narrowing, 99);
+
+        if (scoutingTrips === maxScoutingTrips) {
+            prospectsList[position][playerNum][2] = `${actualOverall}`
+        } else {
+            prospectsList[position][playerNum][2] = `${lowerBound}-${upperBound}`;
+        }
+        
+        prospectsList[position][playerNum][3]++;
+        scoutingHours -= 5;
+    }
+}
+
 function selectTeamScreen() {
     const selectTeamDropdown = document.getElementById("selectTeamDropdown");
     let index = 1;
@@ -540,6 +592,83 @@ function graduatingPlayersScreen() {
     }
 }
 
+function scoutPlayersScreen() {
+    hideAllScreens();
+
+    document.getElementById("btn-menu-container").style.display = "block";
+    const container = document.getElementById("scout-players-screen-container");
+    container.style.display = "block";
+
+    const playersContainer = document.getElementById("scouting-players-table-container");
+    playersContainer.innerHTML = "";
+
+    const acceptedPlayersContainer = document.getElementById("accepted-players");
+    acceptedPlayersContainer.innerHTML = "";
+
+    document.getElementById("scouting-hours").innerHTML = scoutingHours;
+    document.getElementById("scholarships-remaining").innerHTML = scholarshipsRemaining;
+
+    for (let i = 0; i < acceptedPlayers.length; i++) {
+        const playerArr = acceptedPlayers[i];
+        const player = playerArr[0];
+        const playerScoutedOverall = playerArr[2];
+    
+        const playerDiv = document.createElement("div");
+        playerDiv.innerHTML = `${player.position} - ${player.firstName} ${player.lastName} (${playerScoutedOverall} ovr)`;
+        acceptedPlayersContainer.append(playerDiv);
+    }
+
+    for (const position in prospectsList) {
+        const positionContainer = document.createElement("div");
+        const positionTitle = document.createElement("div");
+
+        positionTitle.innerHTML = position;
+
+        playersContainer.append(positionContainer);
+        positionContainer.append(positionTitle);
+
+        let index = 0;
+
+        for (const player in prospectsList[position]) {
+            const nameDiv = document.createElement("div");
+            const infoDiv = document.createElement("div");
+            const scoutBtn = document.createElement("button");
+            const offerBtn = document.createElement("button");
+
+            positionContainer.append(nameDiv);
+            positionContainer.append(infoDiv);
+            positionContainer.append(scoutBtn);
+            positionContainer.append(offerBtn);
+
+            const playerObj = prospectsList[position][player][0];
+            const playerNum = prospectsList[position][player][1];
+            const scoutedOverall = prospectsList[position][player][2];
+
+            nameDiv.innerHTML = `${playerObj.firstName} ${playerObj.lastName}`;
+            infoDiv.innerHTML = `${scoutedOverall}`;
+            scoutBtn.innerHTML = "Scout";
+            offerBtn.innerHTML = "Offer";
+
+            scoutBtn.addEventListener("click", function() {
+                if (scoutingHours > 0) {
+                    scoutProspect(playerObj, playerNum);
+                    scoutPlayersScreen();
+                }
+            });
+
+            offerBtn.addEventListener("click", function() {
+                if (scholarshipsRemaining > 0 && !acceptedPlayers.includes(prospectsList[position][player])) {
+                    acceptedPlayers.push(prospectsList[position][player]);
+                    scholarshipsRemaining--;
+                    scoutPlayersScreen();
+                }
+            });
+
+            index++;
+        }
+    }
+}
+
 function hideAllScreens() {
     document.getElementById("start-screen-container").style.display = "none";
     document.getElementById("btn-menu-container").style.display = "none";
@@ -558,7 +687,7 @@ document.getElementById("selectTeamForm").addEventListener("submit", function (e
     rosterScreen();
 });
 
-document.getElementById("sim-btn").addEventListener("click", function (event) {
+document.getElementById("sim-btn").addEventListener("click", function () {
     if (regularSeasonDay <= 17 && offseasonWeek === 0) {
         simulateRegularSeasonGame();
     } else if (!bracketMatchups.champion && tournamentRound > 0) {
@@ -571,6 +700,9 @@ document.getElementById("sim-btn").addEventListener("click", function (event) {
         graduatingPlayersScreen();
     } else if (offseasonWeek === 1) {
         removeGraduatingPlayers();
+        generateProspects();
+        scoutPlayersScreen();
+        offseasonWeek++;
     }
 });
 
