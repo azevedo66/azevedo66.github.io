@@ -1,6 +1,10 @@
 let userSelectedTeam;
 
+let regularSeasonDay = 1, tournamentRound = 0, offseasonWeek = 0;
+
 const teams = {};
+
+let bracketMatchups = {};
 
 const conferenceTeams = {
     north: ["Aliens", "Astronauts", "Blizzards", "Crabs", "Defenders", "Dragons", "Eagles", "Hammers", "Ogres", "Riot", "Rocks", "Stars", "Tigers", "Volcanoes", "Wind", "Zombies"],
@@ -10,7 +14,6 @@ const conferenceTeams = {
 };
 
 const schedule = {
-    day: 1,
     1: [[1, 2], [8, 10], [9, 16], [7, 11], [3, 15], [6, 12], [4, 14], [5, 13]],
     2: [[9, 10], [1, 3], [8, 11], [2, 16], [7, 12], [4, 15], [6, 13], [5, 14]],
     3: [[2, 3], [9, 11], [1, 4], [8, 12], [10, 16], [7, 13], [5, 15], [6, 14]],
@@ -29,12 +32,8 @@ const schedule = {
     16: [[2, 15], [6, 11], [3, 14], [5, 12], [4, 13]] 
 };
 
-const bracketMatchups = {
-    round: 0
-};
-
 class Team {
-    constructor(name, conference, wins, losses, standing, overall, teamNum, starters, bench) {
+    constructor(name, conference, wins, losses, standing, overall, teamNum, roster, starters, bench) {
         this.name = name;
         this.conference = conference;
         this.wins = wins;
@@ -42,6 +41,7 @@ class Team {
         this.standing = standing;
         this.overall = overall;
         this.teamNum = teamNum;
+        this.roster = roster;
         this.starters = starters;
         this.bench = bench;
     }
@@ -142,6 +142,7 @@ function createLeague() {
         teams[conference] = {}; 
         conferenceTeams[conference].forEach((teamName, index) => {
             const { starters, bench } = generateTeamPlayers();
+            const roster = [...starters, ...bench];
             const teamOverall = calculateTeamOverall(starters, bench);
             const team = new Team(
                 teamName,
@@ -151,6 +152,7 @@ function createLeague() {
                 index + 1,
                 teamOverall,
                 index + 1,
+                roster,
                 starters,
                 bench
             );
@@ -232,9 +234,8 @@ function simulateGame(team1, team2) {
 }
 
 function simulateRegularSeasonGame() {
-    if (schedule.day <= 16) {
-        const day = schedule.day.toString();
-        const dayGames = schedule[day];
+    if (regularSeasonDay <= 16) {
+        const dayGames = schedule[regularSeasonDay];
 
         for (const conference in teams) {
             dayGames.forEach(game => {
@@ -253,19 +254,18 @@ function simulateRegularSeasonGame() {
             })
         }
 
-        schedule.day += 1;
+        regularSeasonDay += 1;
         standingsScreen();
-    } else if (schedule.day === 17) {
-        bracketMatchups.round += 1;
-        schedule.day += 1;
+    } else if (regularSeasonDay === 17) {
+        tournamentRound += 1;
+        regularSeasonDay += 1;
         createBracketMatchups();
         bracketScreen();
     }
 }
 
 function simulateRound() {
-    const round = bracketMatchups.round;
-    const roundMatchups = bracketMatchups[round];
+    const roundMatchups = bracketMatchups[tournamentRound];
     const nextRoundMatchups = [];
 
     if (roundMatchups.length === 1) {
@@ -284,8 +284,8 @@ function simulateRound() {
          nextRoundMatchups.push([winner1, winner2]);
     }
 
-    bracketMatchups[round + 1] = nextRoundMatchups;
-    bracketMatchups.round += 1;
+    bracketMatchups[tournamentRound + 1] = nextRoundMatchups;
+    tournamentRound += 1;
 
     bracketScreen();
 }
@@ -293,7 +293,7 @@ function simulateRound() {
 function createBracketMatchups() {
     const firstRoundMatchups = [[1, 16], [8, 9], [5, 12], [4, 13], [6, 11], [3, 14], [7, 10], [2, 15]];
 
-    if (bracketMatchups.round === 1) {
+    if (tournamentRound === 1) {
         const roundMatchups = [];
 
         for (const conference in teams) {
@@ -306,6 +306,23 @@ function createBracketMatchups() {
 
         bracketMatchups[1] = roundMatchups;
     }
+}
+
+function removeGraduatingPlayers() {
+    Object.values(teams).forEach(conference => {
+        Object.values(conference).forEach(team => {
+            team.roster = team.roster.filter(player => player.year !== "Senior");
+            team.roster.forEach(player => {
+                if (player.year === "Freshman") {
+                    player.year = "Sophomore";
+                } else if (player.year === "Sophomore") {
+                    player.year = "Junior";
+                } else if (player.year === "Junior") {
+                    player.year = "Senior";
+                }
+            })
+        });
+    });
 }
 
 function selectTeamScreen() {
@@ -391,8 +408,7 @@ function scheduleScreen() {
     document.getElementById("schedule-screen-container").style.display = "block";
     document.getElementById("schedule-screen-container").innerHTML = "";
 
-    if (schedule.day <= 16) {
-        const day = schedule.day.toString();
+    if (regularSeasonDay <= 16) {
         for (const conference in teams) {
             const conferenceDiv = document.createElement("div");
             const conferenceTitle = document.createElement("div");
@@ -402,13 +418,14 @@ function scheduleScreen() {
             conferenceTitle.innerHTML = conference;
             document.getElementById("schedule-screen-container").append(conferenceDiv);
             document.getElementById(conference + "-schedule").append(conferenceTitle);
-            for (let i = 0; i < schedule[day].length; i++) {
+
+            for (let i = 0; i < schedule[regularSeasonDay].length; i++) {
                 let team1, team2, record1, record2;
                 for (const team in teams[conference]) {
-                    if (teams[conference][team].teamNum === schedule[day][i][0]) {
+                    if (teams[conference][team].teamNum === schedule[regularSeasonDay][i][0]) {
                         team1 = team;
                         record1 = `(${teams[conference][team].wins}-${teams[conference][team].losses})`;
-                    } else if (teams[conference][team].teamNum === schedule[day][i][1]) {
+                    } else if (teams[conference][team].teamNum === schedule[regularSeasonDay][i][1]) {
                         team2 = team;
                         record2 = `(${teams[conference][team].wins}-${teams[conference][team].losses})`;
                     }
@@ -436,7 +453,7 @@ function bracketScreen() {
     container.innerHTML = "";
 
     for (const round in bracketMatchups) {
-        if (round !== "round" && round !== "champion") {
+        if (round !== "champion") {
             const roundSection = document.createElement("div");
             const roundTitle = document.createElement("div");
             roundSection.id = "round-" + round + "-section";
@@ -485,6 +502,44 @@ function bracketScreen() {
     }
 }
 
+function graduatingPlayersScreen() {
+    hideAllScreens();
+
+    document.getElementById("btn-menu-container").style.display = "block";
+
+    const container = document.getElementById("graduating-players-screen-container");
+    container.style.display = "block";
+
+    const graduatingPlayerList = document.getElementById("graduating-players-container");
+    const returningPlayerList = document.getElementById("returning-players-container");
+    graduatingPlayerList.innerHTML = "";
+    returningPlayerList.innerHTML = "";
+
+    let roster = [];
+
+    for (const conference in teams) {
+        for (const team in teams[conference]) {
+            if (team === userSelectedTeam) {
+                roster = [...teams[conference][team].starters, ...teams[conference][team].bench];
+                break;
+            }
+        }
+    }
+
+    if (roster.length > 0) {
+        for (const player of roster) {
+            const playerDiv = document.createElement("div");
+            playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr)`;
+
+            if (player.year === "Senior") {
+                graduatingPlayerList.append(playerDiv);
+            } else {
+                returningPlayerList.append(playerDiv);
+            }
+        }
+    }
+}
+
 function hideAllScreens() {
     document.getElementById("start-screen-container").style.display = "none";
     document.getElementById("btn-menu-container").style.display = "none";
@@ -492,6 +547,7 @@ function hideAllScreens() {
     document.getElementById("standings-screen-container").style.display = "none";
     document.getElementById("schedule-screen-container").style.display = "none";
     document.getElementById("bracket-screen-container").style.display = "none";
+    document.getElementById("graduating-players-screen-container").style.display = "none";
 }
 
 document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
@@ -503,10 +559,18 @@ document.getElementById("selectTeamForm").addEventListener("submit", function (e
 });
 
 document.getElementById("sim-btn").addEventListener("click", function (event) {
-    if (schedule.day <= 17) {
+    if (regularSeasonDay <= 17 && offseasonWeek === 0) {
         simulateRegularSeasonGame();
-    } else if (!bracketMatchups.champion) {
+    } else if (!bracketMatchups.champion && tournamentRound > 0) {
         simulateRound();
+    } else if (bracketMatchups.champion) {
+        regularSeasonDay = 1;
+        tournamentRound = 0;
+        offseasonWeek = 1;
+        bracketMatchups = {};
+        graduatingPlayersScreen();
+    } else if (offseasonWeek === 1) {
+        removeGraduatingPlayers();
     }
 });
 
