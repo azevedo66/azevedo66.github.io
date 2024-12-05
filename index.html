@@ -14,7 +14,7 @@
             <form id="selectTeamForm">
                 <label for="selectTeamDropdown">Choose a team:</label>
                 <select id="selectTeamDropdown" name="team"></select>
-                <button type="submit">Submit</button>
+                <button type="submit">submit</button>
             </form>
             <p id="selectedTeam"></p>
         </div>
@@ -23,14 +23,18 @@
             <button id="standings-btn" onclick="standingsScreen()">Standings</button>
             <button id="schedule-btn" onclick="scheduleScreen()">Schedule</button>
             <button id="bracket-btn" onclick="bracketScreen()">Bracket</button>
+            <button id="scouting-btn" onclick="scoutPlayersScreen()">Scouting</button>
             <button id="sim-btn">Simulate</button>
         </div>
         <div id="roster-screen-container">
             <h1 id="roster-screen-team-name"></h1>
-            <h1>Starters</h1>
-            <div id="starters-container"></div>
-            <h1>Bench</h1>
-            <div id="bench-container"></div>
+            <div id="team-rotation-container">
+                <h1>Starters</h1>
+                <div id="starters-container"></div>
+                <h1>Bench</h1>
+                <div id="bench-container"></div></div>
+            <h1>Full Roster</h1>
+            <div id="full-roster-container"></div>
         </div>
         <div id="standings-screen-container"></div>
         <div id="schedule-screen-container"></div>
@@ -50,6 +54,26 @@
             </div>
             <h1>Scout Players</h1>
             <div id="scouting-players-table-container"></div>
+        </div>
+        <div id="final-cuts-screen-container">
+            <h1>Choose Final Roster</h1>
+            <div id="final-roster-cuts">
+                <h2>Point Guards (<span id="open-pg-spots">0</span> spots open)</h2>
+                <div id="point-guards-final-cuts"></div>
+                <h2>Shooting Guards (<span id="open-sg-spots">0</span> spots open)</h2>
+                <div id="shooting-guards-final-cuts"></div>
+                <h2>Small Forwards (<span id="open-sf-spots">0</span> spots open)</h2>
+                <div id="small-forward-final-cuts"></div>
+                <h2>Power Forwarad (<span id="open-pf-spots">0</span> spots open)</h2>
+                <div id="power-forward-final-cuts"></div>
+                <h2>Center (<span id="open-c-spots">0</span> spots open)</h2>
+                <div id="center-final-cuts"></div>
+            </div>
+            <h2>Player Pool</h2>
+            <div id="select-player-pool"></div>
+            <h2>Walk Ons</h2>
+            <div id="walk-ons-pool"></div>
+            <button id="submit-team-btn">submit</button>
         </div>
     </div>
     <script src="script.js"></script>

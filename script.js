@@ -5,13 +5,27 @@ let regularSeasonDay = 1, tournamentRound = 0, offseasonWeek = 0;
 let scoutingHours = 300;
 let scholarshipsRemaining = 10;
 
+let openRosterSpots = {
+    "Point Guard": 2,
+    "Shooting Guard": 2,
+    "Small Forward": 2,
+    "Power Forward": 2,
+    "Center": 2
+};
+
 const teams = {};
 
 let prospectsList = {};
 
+let bracketMatchups = {};
+
 let acceptedPlayers = [];
 
-let bracketMatchups = {};
+let finalRoster = [];
+
+let playerPool = [];
+
+let walkOns = [];
 
 const positions = ["Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
 
@@ -104,7 +118,7 @@ function createRandomPlayer(position, year, role) {
     }
 
     function generateOverall(role) {
-        const range = role === "starter" ? [75, 99] : role === "bench" ? [60, 75] : role === "prospect" ? [60, 99] : [0, 0];
+        const range = role === "starter" ? [75, 99] : role === "bench" ? [60, 75] : role === "prospect" ? [60, 99] : role === "walk-on" ? [60, 80] : [0, 0];
         return Math.floor(Math.random() * (range[1] - range[0]) + range[0]);
     }
 
@@ -377,6 +391,108 @@ function scoutProspect(player, playerNum) {
     }
 }
 
+function startNewSeason() {
+    function calculateTeamOverall(starters, bench) {
+        let overallSum = 0;
+
+        for (const player of [...starters, ...bench]) {
+            overallSum += player.overall;
+        }
+
+        return Math.round((overallSum + 70) / 10);
+    }
+
+    for (const conference in teams) {
+        let conferenceStanding = 1;
+        for (const team in teams[conference]) {
+            if (team === userSelectedTeam) {
+                teams[conference][team].roster = finalRoster;
+                console.log("User team roster:")
+                console.log(teams[conference][team].roster);
+            }
+
+            const rosterPlayers = {
+                "Point Guard": [],
+                "Shooting Guard": [],
+                "Small Forward": [],
+                "Power Forward": [],
+                "Center": []
+            };
+
+            const currentTeam = teams[conference][team];
+            const teamRoster = currentTeam.roster;
+
+            for (let i = 0; i < teamRoster.length; i++) {
+                const player = teamRoster[i];
+                const playerPosition = player.position;
+                
+                for (const position in rosterPlayers) {
+                    if (playerPosition === position) {
+                        rosterPlayers[position].push(player);
+                    }
+                }
+            }
+
+            for (const position in rosterPlayers) {
+                while (rosterPlayers[position].length < 2) {
+                    const player1 = createRandomPlayer(position, "Freshman", "prospect");
+                    const player2 = createRandomPlayer(position, "Freshman", "prospect");
+                    const player3 = createRandomPlayer(position, "Freshman", "prospect");
+
+                    const bestOverall = Math.max(player1.overall, player2.overall, player3.overall); 
+                    const bestPlayer = player1.overall === bestOverall ? player1 : player2.overall === bestOverall ? player2 : player3.overall === bestOverall ? player3: player1;
+
+                    rosterPlayers[position].push(bestPlayer);
+                }
+            }
+            
+            teams[conference][team].roster = [];
+            teams[conference][team].starters = [];
+            teams[conference][team].bench = [];
+
+            for (const position in rosterPlayers) {
+                for (let i = 0; i < rosterPlayers[position].length; i += 2) {
+                    const player1 = rosterPlayers[position][i];
+                    const player2 = rosterPlayers[position][i + 1];
+
+                    const bestOverall = Math.max(player1.overall, player2.overall);
+                    const startingPlayer = player1.overall === bestOverall ? player1 : player2;
+                    const benchPlayer = player1.overall !== bestOverall ? player1 : player2;
+                    
+                    teams[conference][team].roster.push(startingPlayer);
+                    teams[conference][team].roster.push(benchPlayer);
+                    teams[conference][team].starters.push(startingPlayer);
+                    teams[conference][team].bench.push(benchPlayer);
+                }
+            }
+
+            teams[conference][team].wins = 0;
+            teams[conference][team].losses = 0;
+            teams[conference][team].standing = conferenceStanding;
+            teams[conference][team].overall = calculateTeamOverall(teams[conference][team].starters, teams[conference][team].bench);
+        }
+    }
+
+    regularSeasonDay = 1;
+    tournamentRound = 0;
+    offseasonWeek = 0;
+    scoutingHours = 300;
+    scholarshipsRemaining = 10; 
+    prospectsList = {};
+    bracketMatchups = {};
+    acceptedPlayers = [];
+    playerPool = [];
+    walkOns = [];
+    finalRoster = [];
+    openRosterSpots = {
+        "Point Guard": 2,
+        "Shooting Guard": 2,
+        "Small Forward": 2,
+        "Power Forward": 2,
+        "Center": 2
+    };
+}
+
 function selectTeamScreen() {
     const selectTeamDropdown = document.getElementById("selectTeamDropdown");
     let index = 1;
@@ -398,7 +514,13 @@ function rosterScreen() {
     document.getElementById("roster-screen-container").style.display = "block";
     document.getElementById("starters-container").innerHTML = "";
     document.getElementById("bench-container").innerHTML = "";
+    document.getElementById("full-roster-container").innerHTML = "";
     document.getElementById("roster-screen-team-name").innerHTML = userSelectedTeam;
+    document.getElementById("team-rotation-container").style.display = "block";
+
+    if (offseasonWeek !== 0) {
+        document.getElementById("team-rotation-container").style.display = "none";
+    }
 
     for (const conference in teams) {
         for (const team in teams[conference]) {
@@ -407,14 +529,21 @@ function rosterScreen() {
                     const player = teams[conference][team]["starters"][i];
                     const playerDiv = document.createElement("div");
                     document.getElementById("starters-container").append(playerDiv);
-                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight}`;
+                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
                 }
-
+    
                 for (let i = 0; i < teams[conference][team]["bench"].length; i++) {
                     const player = teams[conference][team]["bench"][i];
                     const playerDiv = document.createElement("div");
                     document.getElementById("bench-container").append(playerDiv);
-                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight}`;
+                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
+                }
+    
+                for (let i = 0; i < teams[conference][team]["roster"].length; i++) {
+                    const player = teams[conference][team]["roster"][i];
+                    const playerDiv = document.createElement("div");
+                    document.getElementById("full-roster-container").append(playerDiv);
+                    playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
                 }
             }
         }
@@ -669,6 +798,125 @@ function scoutPlayersScreen() {
     }
 }
 
+function finalCutsScreen() {
+    hideAllScreens();
+    const rosterLimit = 10;
+
+    document.getElementById("final-cuts-screen-container").style.display = "block";
+    document.getElementById("point-guards-final-cuts").innerHTML = "";
+    document.getElementById("shooting-guards-final-cuts").innerHTML = "";
+    document.getElementById("small-forward-final-cuts").innerHTML = "";
+    document.getElementById("power-forward-final-cuts").innerHTML = "";
+    document.getElementById("center-final-cuts").innerHTML = "";
+
+    document.getElementById("open-pg-spots").innerHTML = openRosterSpots["Point Guard"];
+    document.getElementById("open-sg-spots").innerHTML = openRosterSpots["Shooting Guard"];
+    document.getElementById("open-sf-spots").innerHTML = openRosterSpots["Small Forward"];
+    document.getElementById("open-pf-spots").innerHTML = openRosterSpots["Power Forward"];
+    document.getElementById("open-c-spots").innerHTML = openRosterSpots["Center"];
+
+    document.getElementById("select-player-pool").innerHTML = "";
+    document.getElementById("walk-ons-pool").innerHTML = "";
+
+    if (playerPool.length === 0 && finalRoster.length === 0) {
+        for (const conference in teams) {
+            for (const team in teams[conference]) {
+                if (team === userSelectedTeam) {
+                    for (let i = 0; i < teams[conference][team]["roster"].length; i++) {
+                        playerPool.push(teams[conference][team]["roster"][i]);
+                    }
+                }
+            }
+        }
+        
+        const acceptedPlayersArr = [];
+        for (const player in acceptedPlayers) {
+            acceptedPlayersArr.push(acceptedPlayers[player][0]);
+        }
+
+        playerPool.push(...acceptedPlayersArr);
+
+        for (let i = 0; i < positions.length; i++) {
+            const position = positions[i];
+            const player1 = createRandomPlayer(position, "Freshman", "walk-on");
+            const player2 = createRandomPlayer(position, "Freshman", "walk-on");
+            walkOns.push(player1);
+            walkOns.push(player2);
+        }
+    }
+    
+    for (let i = 0; i < finalRoster.length; i++) {
+        const player = finalRoster[i];
+
+        const playerDiv = document.createElement("div");
+        playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
+        
+        if (player.position === "Point Guard") {
+            document.getElementById("point-guards-final-cuts").append(playerDiv);
+        } else if (player.position === "Shooting Guard") {
+            document.getElementById("shooting-guards-final-cuts").append(playerDiv);
+        } else if (player.position === "Small Forward") {
+            document.getElementById("small-forward-final-cuts").append(playerDiv);
+        } else if (player.position === "Power Forward") {
+            document.getElementById("power-forward-final-cuts").append(playerDiv);
+        } else if (player.position === "Center") {
+            document.getElementById("center-final-cuts").append(playerDiv);
+        }
+    }
+
+    for (let i = 0; i < playerPool.length; i++) {
+        const player = playerPool[i];
+
+        const playerContainer = document.createElement("div");
+        const playerDiv = document.createElement("div");
+        const chooseBtn = document.createElement("button");
+
+        playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
+        chooseBtn.innerHTML = "choose";
+
+        document.getElementById("select-player-pool").append(playerContainer);
+        playerContainer.append(playerDiv);
+        playerContainer.append(chooseBtn);
+
+        chooseBtn.addEventListener("click", function() {
+            if (openRosterSpots[player.position] > 0) {
+                playerPool = playerPool.filter(element => element !== player);
+                finalRoster.push(player);
+                openRosterSpots[player.position]--;
+                finalCutsScreen();
+            }
+        });
+    }
+
+    for (let i = 0; i < walkOns.length; i++) {
+        const player = walkOns[i];
+
+        const playerContainer = document.createElement("div");
+        const playerDiv = document.createElement("div");
+        const chooseBtn = document.createElement("button");
+
+        playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
+        chooseBtn.innerHTML = "choose";
+
+        document.getElementById("walk-ons-pool").append(playerContainer);
+        playerContainer.append(playerDiv);
+        playerContainer.append(chooseBtn);
+
+        chooseBtn.addEventListener("click", function() {
+            if (openRosterSpots[player.position] > 0) {
+                walkOns = walkOns.filter(element => element !== player);
+                finalRoster.push(player);
+                openRosterSpots[player.position]--;
+                finalCutsScreen();
+            }
+        })
+    }
+
+    if (finalRoster.length === rosterLimit) {
+        document.getElementById("submit-team-btn").style.display = "block";
+    }
+}
+
 function hideAllScreens() {
     document.getElementById("start-screen-container").style.display = "none";
     document.getElementById("btn-menu-container").style.display = "none";
@@ -677,6 +925,8 @@ function hideAllScreens() {
     document.getElementById("schedule-screen-container").style.display = "none";
     document.getElementById("bracket-screen-container").style.display = "none";
     document.getElementById("graduating-players-screen-container").style.display = "none";
+    document.getElementById("scout-players-screen-container").style.display = "none";
+    document.getElementById("final-cuts-screen-container").style.display = "none";
 }
 
 document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
@@ -693,17 +943,25 @@ document.getElementById("sim-btn").addEventListener("click", function () {
     } else if (!bracketMatchups.champion && tournamentRound > 0) {
         simulateRound();
     } else if (bracketMatchups.champion) {
-        regularSeasonDay = 1;
-        tournamentRound = 0;
-        offseasonWeek = 1;
         bracketMatchups = {};
+        tournamentRound = 0;
+        regularSeasonDay = 1;
+        offseasonWeek++;
         graduatingPlayersScreen();
     } else if (offseasonWeek === 1) {
         removeGraduatingPlayers();
         generateProspects();
         scoutPlayersScreen();
         offseasonWeek++;
+    } else if (offseasonWeek === 2) {
+        finalCutsScreen();
     }
+});
+
+document.getElementById("submit-team-btn").addEventListener("click", function() {
+    startNewSeason();
+    rosterScreen();
+    console.log(teams);
 });
 
 selectTeamScreen();
