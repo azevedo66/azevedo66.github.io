@@ -8,23 +8,22 @@
 </head>
 <body>
     <div id="container">
-        <h1>College Basketball Coach</h1>
+        <h1 id="game-title">College Basketball Coach</h1>
         <hr>
         <div id="start-screen-container">
             <form id="selectTeamForm">
-                <label for="selectTeamDropdown">Choose a team:</label>
+                <label for="selectTeamDropdown" id="choose-team-title">Choose a team:</label>
                 <select id="selectTeamDropdown" name="team"></select>
-                <button type="submit">submit</button>
+                <button id="start-submit-btn" class="button1" type="submit">submit</button>
             </form>
-            <p id="selectedTeam"></p>
         </div>
         <div id="btn-menu-container">
-            <button id="team-roster-btn" onclick="rosterScreen()">Roster</button>
-            <button id="standings-btn" onclick="standingsScreen()">Standings</button>
-            <button id="schedule-btn" onclick="scheduleScreen()">Schedule</button>
-            <button id="bracket-btn" onclick="bracketScreen()">Bracket</button>
-            <button id="scouting-btn" onclick="scoutPlayersScreen()">Scouting</button>
-            <button id="sim-btn">Simulate</button>
+            <button id="team-roster-btn" class="button2" onclick="rosterScreen()">Roster</button>
+            <button id="standings-btn" class="button2" onclick="standingsScreen()">Standings</button>
+            <button id="schedule-btn" class="button2" onclick="scheduleScreen()">Schedule</button>
+            <button id="bracket-btn" class="button2" onclick="bracketScreen()">Bracket</button>
+            <button id="scouting-btn" class="button2" onclick="scoutPlayersScreen()">Scouting</button>
+            <button id="sim-btn" class="button2">Simulate</button>
         </div>
         <div id="roster-screen-container">
             <h1 id="roster-screen-team-name"></h1>
@@ -33,7 +32,7 @@
                 <div id="starters-container"></div>
                 <h1>Bench</h1>
                 <div id="bench-container"></div></div>
-            <h1>Full Roster</h1>
+            <h1 id="full-roster-screen-title">Full Roster</h1>
             <div id="full-roster-container"></div>
         </div>
         <div id="standings-screen-container"></div>
@@ -56,23 +55,57 @@
             <div id="scouting-players-table-container"></div>
         </div>
         <div id="final-cuts-screen-container">
-            <h1>Choose Final Roster</h1>
-            <div id="final-roster-cuts">
-                <h2>Point Guards (<span id="open-pg-spots">0</span> spots open)</h2>
-                <div id="point-guards-final-cuts"></div>
-                <h2>Shooting Guards (<span id="open-sg-spots">0</span> spots open)</h2>
-                <div id="shooting-guards-final-cuts"></div>
-                <h2>Small Forwards (<span id="open-sf-spots">0</span> spots open)</h2>
-                <div id="small-forward-final-cuts"></div>
-                <h2>Power Forwarad (<span id="open-pf-spots">0</span> spots open)</h2>
-                <div id="power-forward-final-cuts"></div>
-                <h2>Center (<span id="open-c-spots">0</span> spots open)</h2>
-                <div id="center-final-cuts"></div>
-            </div>
-            <h2>Player Pool</h2>
-            <div id="select-player-pool"></div>
-            <h2>Walk Ons</h2>
-            <div id="walk-ons-pool"></div>
+            <h1 id="final-roster-screen-title">Choose Final Roster</h1>
+            <table id="final-cuts">
+                <tr>
+                    <th class="final-cut-position">Point<br>Guards<br>(<span id="open-pg-spots"></span>)</th>
+                    <th class="final-cut-position">Shooting<br>Guards<br>(<span id="open-sg-spots"></span>)</th>
+                    <th class="final-cut-position">Small<br>Forwards<br>(<span id="open-sf-spots"></span>)</th>
+                    <th class="final-cut-position">Power<br>Forwards<br>(<span id="open-pf-spots"></span>)</th>
+                    <th class="final-cut-position">Centers<br>(<span id="open-c-spots"></span>)</th>
+                </tr>
+                <tr>
+                    <td id="point-guards-final-cuts"></td>
+                    <td id="shooting-guards-final-cuts"></td>
+                    <td id="small-forwards-final-cuts"></td>
+                    <td id="power-forwards-final-cuts"></td>
+                    <td id="centers-final-cuts"></td>
+                </tr>
+            </table>
+            <h1 id="player-pool-title">Player Pool</h1>
+            <table id="select-player-pool">
+                <tr>
+                    <th class="player-pool-position">Point<br>Guards</th>
+                    <th class="player-pool-position">Shooting<br>Guards</th>
+                    <th class="player-pool-position">Small<br>Forwards</th>
+                    <th class="player-pool-position">Power<br>Forwards</th>
+                    <th class="player-pool-position">Centers</th>
+                </tr>
+                <tr>
+                    <td id="point-guards-pool"></td>
+                    <td id="shooting-guards-pool"></td>
+                    <td id="small-forwards-pool"></td>
+                    <td id="power-forwards-pool"></td>
+                    <td id="centers-pool"></td>
+                </tr>
+            </table>
+            <h1 id="walk-on-title">Walk Ons</h1>
+            <table id="walk-ons-pool">
+                <tr>
+                    <th class="walk-on-position">Point<br>Guards</th>
+                    <th class="walk-on-position">Shooting<br>Guards</th>
+                    <th class="walk-on-position">Small<br>Forwards</th>
+                    <th class="walk-on-position">Power<br>Forwards</th>
+                    <th class="walk-on-position">Centers</th>
+                </tr>
+                <tr>
+                    <td id="point-guard-walk-ons"></td>
+                    <td id="shooting-guard-walk-ons"></td>
+                    <td id="small-forward-walk-ons"></td>
+                    <td id="power-forward-walk-ons"></td>
+                    <td id="center-walk-ons"></td>
+                </tr>
+            </table>
             <button id="submit-team-btn">submit</button>
         </div>
     </div>

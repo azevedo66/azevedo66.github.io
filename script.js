@@ -2,7 +2,7 @@ let userSelectedTeam;
 
 let regularSeasonDay = 1, tournamentRound = 0, offseasonWeek = 0;
 
-let scoutingHours = 300;
+let scoutingHours = 200;
 let scholarshipsRemaining = 10;
 
 let openRosterSpots = {
@@ -476,7 +476,7 @@ function startNewSeason() {
     regularSeasonDay = 1;
     tournamentRound = 0;
     offseasonWeek = 0;
-    scoutingHours = 300;
+    scoutingHours = 200;
     scholarshipsRemaining = 10; 
     prospectsList = {};
     bracketMatchups = {};
@@ -586,7 +586,7 @@ function standingsScreen() {
 function scheduleScreen() {
     hideAllScreens();
     document.getElementById("btn-menu-container").style.display = "block";
-    document.getElementById("schedule-screen-container").style.display = "block";
+    document.getElementById("schedule-screen-container").style.display = "flex";
     document.getElementById("schedule-screen-container").innerHTML = "";
 
     if (regularSeasonDay <= 16) {
@@ -595,6 +595,7 @@ function scheduleScreen() {
             const conferenceTitle = document.createElement("div");
             conferenceDiv.id = conference + "-schedule";
             conferenceTitle.id = conference + "-title-schedule";
+            conferenceDiv.className = "conference-section-schedule";
             conferenceTitle.className = "conference-title-schedule";
             conferenceTitle.innerHTML = conference;
             document.getElementById("schedule-screen-container").append(conferenceDiv);
@@ -805,9 +806,9 @@ function finalCutsScreen() {
     document.getElementById("final-cuts-screen-container").style.display = "block";
     document.getElementById("point-guards-final-cuts").innerHTML = "";
     document.getElementById("shooting-guards-final-cuts").innerHTML = "";
-    document.getElementById("small-forward-final-cuts").innerHTML = "";
-    document.getElementById("power-forward-final-cuts").innerHTML = "";
-    document.getElementById("center-final-cuts").innerHTML = "";
+    document.getElementById("small-forwards-final-cuts").innerHTML = "";
+    document.getElementById("power-forwards-final-cuts").innerHTML = "";
+    document.getElementById("centers-final-cuts").innerHTML = "";
 
     document.getElementById("open-pg-spots").innerHTML = openRosterSpots["Point Guard"];
     document.getElementById("open-sg-spots").innerHTML = openRosterSpots["Shooting Guard"];
@@ -815,8 +816,17 @@ function finalCutsScreen() {
     document.getElementById("open-pf-spots").innerHTML = openRosterSpots["Power Forward"];
     document.getElementById("open-c-spots").innerHTML = openRosterSpots["Center"];
 
-    document.getElementById("select-player-pool").innerHTML = "";
-    document.getElementById("walk-ons-pool").innerHTML = "";
+    document.getElementById("point-guards-pool").innerHTML = "";
+    document.getElementById("shooting-guards-pool").innerHTML = "";
+    document.getElementById("small-forwards-pool").innerHTML = "";
+    document.getElementById("power-forwards-pool").innerHTML = "";
+    document.getElementById("centers-pool").innerHTML = "";
+
+    document.getElementById("point-guard-walk-ons").innerHTML = "";
+    document.getElementById("shooting-guard-walk-ons").innerHTML = "";
+    document.getElementById("small-forward-walk-ons").innerHTML = "";
+    document.getElementById("power-forward-walk-ons").innerHTML = "";
+    document.getElementById("center-walk-ons").innerHTML = "";
 
     if (playerPool.length === 0 && finalRoster.length === 0) {
         for (const conference in teams) {
@@ -849,18 +859,19 @@ function finalCutsScreen() {
         const player = finalRoster[i];
 
         const playerDiv = document.createElement("div");
-        playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
-        
+        playerDiv.innerHTML = `${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
+        playerDiv.className = "player-pool-player-div";
+
         if (player.position === "Point Guard") {
             document.getElementById("point-guards-final-cuts").append(playerDiv);
         } else if (player.position === "Shooting Guard") {
             document.getElementById("shooting-guards-final-cuts").append(playerDiv);
         } else if (player.position === "Small Forward") {
-            document.getElementById("small-forward-final-cuts").append(playerDiv);
+            document.getElementById("small-forwards-final-cuts").append(playerDiv);
         } else if (player.position === "Power Forward") {
-            document.getElementById("power-forward-final-cuts").append(playerDiv);
+            document.getElementById("power-forwards-final-cuts").append(playerDiv);
         } else if (player.position === "Center") {
-            document.getElementById("center-final-cuts").append(playerDiv);
+            document.getElementById("centers-final-cuts").append(playerDiv);
         }
     }
 
@@ -874,7 +885,18 @@ function finalCutsScreen() {
         playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
         chooseBtn.innerHTML = "choose";
 
-        document.getElementById("select-player-pool").append(playerContainer);
+        if (player.position === "Point Guard") {
+            document.getElementById("point-guards-pool").append(playerContainer);
+        } else if (player.position === "Shooting Guard") {
+            document.getElementById("shooting-guards-pool").append(playerContainer);
+        } else if (player.position === "Small Forward") {
+            document.getElementById("small-forwards-pool").append(playerContainer);
+        } else if (player.position === "Power Forward") {
+            document.getElementById("power-forwards-pool").append(playerContainer);
+        } else if (player.position === "Center") {
+            document.getElementById("centers-pool").append(playerContainer);
+        }
+
         playerContainer.append(playerDiv);
         playerContainer.append(chooseBtn);
 
@@ -898,7 +920,18 @@ function finalCutsScreen() {
         playerDiv.innerHTML = `${player.position}: ${player.firstName} ${player.lastName} (${player.overall} ovr) Height: ${player.height} Weight: ${player.weight} Year: ${player.year}`;
         chooseBtn.innerHTML = "choose";
 
-        document.getElementById("walk-ons-pool").append(playerContainer);
+        if (player.position === "Point Guard") {
+            document.getElementById("point-guard-walk-ons").append(playerContainer);
+        } else if (player.position === "Shooting Guard") {
+            document.getElementById("shooting-guard-walk-ons").append(playerContainer);
+        } else if (player.position === "Small Forward") {
+            document.getElementById("small-forward-walk-ons").append(playerContainer);
+        } else if (player.position === "Power Forward") {
+            document.getElementById("power-forward-walk-ons").append(playerContainer);
+        } else if (player.position === "Center") {
+            document.getElementById("center-walk-ons").append(playerContainer);
+        }
+
         playerContainer.append(playerDiv);
         playerContainer.append(chooseBtn);
 
