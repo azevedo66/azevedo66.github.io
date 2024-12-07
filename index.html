@@ -12,7 +12,7 @@
         <hr>
         <div id="start-screen-container">
             <form id="selectTeamForm">
-                <label for="selectTeamDropdown" id="choose-team-title">Choose a team:</label>
+                <label for="selectTeamDropdown" class="title1">Choose a team:</label>
                 <select id="selectTeamDropdown" name="team"></select>
                 <button id="start-submit-btn" class="button1" type="submit">submit</button>
             </form>
@@ -26,36 +26,51 @@
             <button id="sim-btn" class="button2">Simulate</button>
         </div>
         <div id="roster-screen-container">
-            <h1 id="roster-screen-team-name"></h1>
+            <h1 id="roster-screen-team-name" class="title2"></h1>
             <div id="team-rotation-container">
-                <h1>Starters</h1>
+                <h1 class="title2">Starters</h1>
                 <div id="starters-container"></div>
-                <h1>Bench</h1>
+                <h1 class="title2">Bench</h1>
                 <div id="bench-container"></div></div>
-            <h1 id="full-roster-screen-title">Full Roster</h1>
+            <h1 id="full-roster-screen-title" class="title2">Full Roster</h1>
             <div id="full-roster-container"></div>
         </div>
         <div id="standings-screen-container"></div>
         <div id="schedule-screen-container"></div>
         <div id="bracket-screen-container"></div>
         <div id="graduating-players-screen-container">
-            <h1>Graduating Players:</h1>
+            <h1 class="title3">Graduating Players:</h1>
             <div id="graduating-players-container"></div>
-            <h1>Returning Players</h1>
+            <h1 class="title3">Returning Players</h1>
             <div id="returning-players-container"></div>
         </div>
         <div id="scout-players-screen-container">
-            <h1>Scouting Resources</h1>
+            <div class="title2">Scouting Resources</div>
             <div id="scouting-resources-container">
-                <div>Scouting Hours: <div id="scouting-hours"></div></div>
-                <div>Scholarships Remaining: <div id="scholarships-remaining"></div></div>
-                <div>Accepted Players: <div id="accepted-players"></div></div>
+                <div class="title3">Scouting Hours: <div id="scouting-hours"></div></div>
+                <div class="title3">Scholarships Remaining: <div id="scholarships-remaining"></div></div>
+                <div class="title3">Accepted Players: <div id="accepted-players"></div></div>
             </div>
-            <h1>Scout Players</h1>
-            <div id="scouting-players-table-container"></div>
+            <div class="title2">Scout Players</div>
+            <table id="scout-players-table">
+                <tr>
+                    <th class="scout-player-position">Point<br>Guards</th>
+                    <th class="scout-player-position">Shooting<br>Guards</th>
+                    <th class="scout-player-position">Small<br>Forwards</th>
+                    <th class="scout-player-position">Power<br>Forwards</th>
+                    <th class="scout-player-position">Centers</th>
+                </tr>
+                <tr>
+                    <td id="scout-point-guards"></td>
+                    <td id="scout-shooting-guards"></td>
+                    <td id="scout-small-forwards"></td>
+                    <td id="scout-power-forwards"></td>
+                    <td id="scout-centers"></td>
+                </tr>
+            </table>
         </div>
         <div id="final-cuts-screen-container">
-            <h1 id="final-roster-screen-title">Choose Final Roster</h1>
+            <h1 id="final-roster-screen-title" class="title2">Choose Final Roster</h1>
             <table id="final-cuts">
                 <tr>
                     <th class="final-cut-position">Point<br>Guards<br>(<span id="open-pg-spots"></span>)</th>
@@ -72,7 +87,7 @@
                     <td id="centers-final-cuts"></td>
                 </tr>
             </table>
-            <h1 id="player-pool-title">Player Pool</h1>
+            <h1 id="player-pool-title" class="title3">Player Pool</h1>
             <table id="select-player-pool">
                 <tr>
                     <th class="player-pool-position">Point<br>Guards</th>
@@ -89,7 +104,7 @@
                     <td id="centers-pool"></td>
                 </tr>
             </table>
-            <h1 id="walk-on-title">Walk Ons</h1>
+            <h1 id="walk-on-title" class="title3">Walk Ons</h1>
             <table id="walk-ons-pool">
                 <tr>
                     <th class="walk-on-position">Point<br>Guards</th>
@@ -106,7 +121,7 @@
                     <td id="center-walk-ons"></td>
                 </tr>
             </table>
-            <button id="submit-team-btn">submit</button>
+            <button id="submit-team-btn" class="button2">submit</button>
         </div>
     </div>
     <script src="script.js"></script>

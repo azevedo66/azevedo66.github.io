@@ -2,25 +2,39 @@ body {
     font-family: sans-serif;
     background-color: rgb(193, 193, 193);
 }
-
-#btn-menu-container, #roster-screen-container, #standings-screen-container, #schedule-screen-container, #graduating-players-screen-container, #scout-players-screen-container, #final-cuts-screen-container, #submit-team-btn {
-    display: none;
+#game-title {
+    font-family: impact, fantasy;
+    font-size: 50px;
+    text-align: center; 
 }
 
-#standings-screen-container, #schedule-screen-containers {
+#start-screen-container {
+    display: block;
+    text-align: center;
+}
+
+#selectTeamDropdown {
+    display: block;
+    padding: 15px;
+    margin: 15px auto;
+    font-size: 20px;
+}
+
+#btn-menu-container, #roster-screen-container, #graduating-players-screen-container, #scout-players-screen-container, #final-cuts-screen-container {
+    text-align: center;
+}
+
+#standings-screen-container, #schedule-screen-container {
     display: flex;
     justify-content: center;
 }
 
-.player-pool-section, #final-roster-cuts {
-    display: flex;
-    justify-content: space-evenly;
-}
-
 .conference-title-standings, .conference-title-schedule {
-    text-transform: capitalize;
-    font-weight: bold;
     text-align: center;
+    text-transform: capitalize;
+    text-decoration: underline;
+    font-weight: bold;
+    font-size: 20px;
 }
 
 #bracket-screen-container {
@@ -44,82 +58,37 @@ body {
     border-top: 2px solid black;
 }
 
-#standings-title, #schedule-title {
-    text-align: center;
-    font-weight: bold;
+#scout-players-table, #final-cuts, #select-player-pool, #walk-ons-pool {
+    width: 100%;
 }
 
-.scouting-position-container {
-    display: inline-block;
+.scout-player-position, .final-cut-position, .player-pool-position {
+    width: 20%;
 }
-
-.player-section-scouting, .position-title-scouting {
-    padding: 5px;
-    margin: 5px;
-    text-align: center;
-}
-
-#start-screen-container {
-    display: block;
-    text-align: center;
-}
-
-#choose-team-title, #final-roster-screen-title {
+.title1 {
     font-size: 50px;
-    font-weight: bold;
-    display: block;
-}
-
-#game-title {
-    font-family: impact, fantasy;
-    font-size: 50px;
-    text-align: center; 
-}
-
-#selectTeamDropdown {
-    display: block;
-    padding: 15px;
-    margin: 15px auto;
-    font-size: 20px;
-}
-
-#start-submit-btn {
-    display: block;
-    margin: 15px auto;
-    padding: 15px;
-}
-
-#btn-menu-container {
-    text-align: center;
-}
-
-#team-rotation-container, #full-roster-screen-title, #player-pool-title,  #walk-on-title {
-    text-align: center;
-}
-
-#full-roster-container {
-    text-align: center;
-    font-size: 20px;
-}
-
-#starters-container, #bench-container {
-    font-size: 20px;
-}
-#roster-screen-team-name {
-    text-align: center;
-    font-size: 40px;
     font-weight: bold;
     text-decoration: underline;
 }
 
-.player-pool-position-section {
-    width: 20%;
+.title2 {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.title3 {
+    font-size: 30px;
+    font-weight: bold;
 }
 
 .button1 {
-    color: white;
-    background-color: black;
+    color: black;
+    background-color: white;
     font-size: 25px;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
 }
 
 .button2 {
@@ -128,12 +97,4 @@ body {
     font-size: 20px;
     font-weight: bold;
     border-radius: 10px;
-}
-
-#walk-ons-pool, #final-cuts, #select-player-pool {
-    width: 100%;
-}
-
-.walk-on-position, .player-pool-position, .final-cut-position {
-    width: 20%;
 }

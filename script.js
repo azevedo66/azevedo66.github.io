@@ -494,6 +494,9 @@ function startNewSeason() {
 }
 
 function selectTeamScreen() {
+    hideAllScreens();
+
+    document.getElementById("start-screen-container").style.display = "block";
     const selectTeamDropdown = document.getElementById("selectTeamDropdown");
     let index = 1;
 
@@ -729,11 +732,21 @@ function scoutPlayersScreen() {
     const container = document.getElementById("scout-players-screen-container");
     container.style.display = "block";
 
-    const playersContainer = document.getElementById("scouting-players-table-container");
-    playersContainer.innerHTML = "";
 
     const acceptedPlayersContainer = document.getElementById("accepted-players");
     acceptedPlayersContainer.innerHTML = "";
+
+    const pointGuardContainer = document.getElementById("scout-point-guards");
+    const shootingGuardContainer = document.getElementById("scout-shooting-guards");
+    const smallForwardContainer = document.getElementById("scout-small-forwards");
+    const powerForwardContainer = document.getElementById("scout-power-forwards");
+    const centerContainer = document.getElementById("scout-centers");
+
+    pointGuardContainer.innerHTML = "";
+    shootingGuardContainer.innerHTML = "";
+    smallForwardContainer.innerHTML = "";
+    powerForwardContainer.innerHTML = "";
+    centerContainer.innerHTML = "";
 
     document.getElementById("scouting-hours").innerHTML = scoutingHours;
     document.getElementById("scholarships-remaining").innerHTML = scholarshipsRemaining;
@@ -750,12 +763,18 @@ function scoutPlayersScreen() {
 
     for (const position in prospectsList) {
         const positionContainer = document.createElement("div");
-        const positionTitle = document.createElement("div");
 
-        positionTitle.innerHTML = position;
-
-        playersContainer.append(positionContainer);
-        positionContainer.append(positionTitle);
+        if (position === "Point Guard") {
+            pointGuardContainer.append(positionContainer);
+        } else if (position === "Shooting Guard") {
+             shootingGuardContainer.append(positionContainer);
+        } else if (position === "Small Forward") {
+            smallForwardContainer.append(positionContainer);
+        } else if (position === "Power Forward") {
+              powerForwardContainer.append(positionContainer);
+        } else if (position === "Center") {
+            centerContainer.append(positionContainer);
+        }
 
         let index = 0;
 
@@ -960,6 +979,7 @@ function hideAllScreens() {
     document.getElementById("graduating-players-screen-container").style.display = "none";
     document.getElementById("scout-players-screen-container").style.display = "none";
     document.getElementById("final-cuts-screen-container").style.display = "none";
+    document.getElementById("submit-team-btn").style.display = "none";
 }
 
 document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
