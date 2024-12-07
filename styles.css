@@ -20,7 +20,7 @@ body {
     font-size: 20px;
 }
 
-#btn-menu-container, #roster-screen-container, #graduating-players-screen-container, #scout-players-screen-container, #final-cuts-screen-container {
+#btn-menu-container, #roster-screen-container, #graduating-players-screen-container, #scout-players-screen-container, #final-cuts-screen-container, #player-progression-screen-container {
     text-align: center;
 }
 

@@ -2,7 +2,7 @@ let userSelectedTeam;
 
 let regularSeasonDay = 1, tournamentRound = 0, offseasonWeek = 0;
 
-let scoutingHours = 200;
+let scoutingHours = 100;
 let scholarshipsRemaining = 10;
 
 let openRosterSpots = {
@@ -118,7 +118,7 @@ function createRandomPlayer(position, year, role) {
     }
 
     function generateOverall(role) {
-        const range = role === "starter" ? [75, 99] : role === "bench" ? [60, 75] : role === "prospect" ? [60, 99] : role === "walk-on" ? [60, 80] : [0, 0];
+        const range = role === "starter" ? [75, 99] : role === "bench" ? [65, 75] : role === "prospect" ? [65, 85] : role === "walk-on" ? [65, 75] : [0, 0];
         return Math.floor(Math.random() * (range[1] - range[0]) + range[0]);
     }
 
@@ -350,6 +350,32 @@ function removeGraduatingPlayers() {
     });
 }
 
+function playerProgression() {
+    const minProgression = 1;
+    const maxProgression = 5;
+
+    const rosterDiv = document.createElement("div");
+    document.getElementById("player-progression").append(rosterDiv);
+
+    Object.values(teams).forEach(conference => {
+        Object.values(conference).forEach(team => {
+            for (const player of team.roster) {
+                const oldOverall = player.overall;
+                const progression = Math.floor(Math.random() * (maxProgression - minProgression + 1)) + minProgression;
+
+                player.overall = Math.min(player.overall + progression, 99);
+                
+                const overallChange = player.overall - oldOverall;
+                if (team.name === userSelectedTeam) {
+                    const playerDiv = document.createElement("div");
+                    playerDiv.innerHTML = `${player.firstName} ${player.lastName}: ${oldOverall} -> ${player.overall} overall  (+${overallChange})`;
+                    rosterDiv.append(playerDiv);
+                }
+            }
+        });
+    });
+}
+
 function generateProspects() {
     const numberOfPositions = 5;
     const prospectsPerPosition = 20;
@@ -376,9 +402,9 @@ function scoutProspect(player, playerNum) {
     const scoutingTrips = prospectsList[position][playerNum][3];
 
     if (scoutingTrips <= maxScoutingTrips) {
-        const narrowing = Math.max(1, Math.floor((99 - 60) / (2 * (scoutingTrips + 1))));
-        const lowerBound = Math.max(actualOverall - narrowing, 60);
-        const upperBound = Math.min(actualOverall + narrowing, 99);
+        const narrowing = Math.max(1, Math.floor((85 - 65) / (2 * (scoutingTrips + 1))));
+        const lowerBound = Math.max(actualOverall - narrowing, 65);
+        const upperBound = Math.min(actualOverall + narrowing, 85);
 
         if (scoutingTrips === maxScoutingTrips) {
             prospectsList[position][playerNum][2] = `${actualOverall}`
@@ -476,7 +502,7 @@ function startNewSeason() {
     regularSeasonDay = 1;
     tournamentRound = 0;
     offseasonWeek = 0;
-    scoutingHours = 200;
+    scoutingHours = 100;
     scholarshipsRemaining = 10; 
     prospectsList = {};
     bracketMatchups = {};
@@ -723,6 +749,17 @@ function graduatingPlayersScreen() {
             }
         }
     }
+}
+
+function playerProgressionScreen() {
+    hideAllScreens();
+
+    document.getElementById("btn-menu-container").style.display = "block";
+    document.getElementById("player-progression-screen-container").style.display = "block";
+    document.getElementById("player-progression").innerHTML = "";
+
+    playerProgression();
+
 }
 
 function scoutPlayersScreen() {
@@ -980,6 +1017,7 @@ function hideAllScreens() {
     document.getElementById("scout-players-screen-container").style.display = "none";
     document.getElementById("final-cuts-screen-container").style.display = "none";
     document.getElementById("submit-team-btn").style.display = "none";
+    document.getElementById("player-progression-screen-container").style.display = "none";
 }
 
 document.getElementById("selectTeamForm").addEventListener("submit", function (event) {
@@ -1003,10 +1041,13 @@ document.getElementById("sim-btn").addEventListener("click", function () {
         graduatingPlayersScreen();
     } else if (offseasonWeek === 1) {
         removeGraduatingPlayers();
+        playerProgressionScreen()
+        offseasonWeek++;
+    } else if (offseasonWeek === 2) {
         generateProspects();
         scoutPlayersScreen();
         offseasonWeek++;
-    } else if (offseasonWeek === 2) {
+    } else if (offseasonWeek === 3) {
         finalCutsScreen();
     }
 });
