@@ -229,8 +229,8 @@ function simulateGame(team1, team2) {
 
     function simulatePlayerScore(offPlayer, defPlayer) {
         const randomNum = Math.random();
-        const offOverall = Math.pow(offPlayer.overall, 2);
-        const defOverall = Math.pow(defPlayer.overall, 2);
+        const offOverall = Math.pow(offPlayer.overall, 3);
+        const defOverall = Math.pow(defPlayer.overall, 3);
         const chance = offOverall / (offOverall + defOverall);
         if (randomNum < chance) {
             const pointAmountNum = Math.random() * 100;
