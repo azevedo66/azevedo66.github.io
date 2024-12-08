@@ -207,28 +207,30 @@ function orderStandings() {
 function simulateGame(team1, team2) {
     const starterPossessions = 50;
     const benchPossessions = 25;
-    const minFgPercentage = 40;
 
     let teamScore1 = 0;
     let teamScore2 = 0;
 
-    function simulatePossession(team, lineup) {
-        let player;
+    function simulatePossession(offTeam, defTeam, lineup) {
+        let offPlayer;
+        let defPlayer;
         if (lineup === "starters") {
-            const randomPlayerIndex = Math.floor(Math.random() * team.starters.length);
-            player = team.starters[randomPlayerIndex];
+            const randomPlayerIndex = Math.floor(Math.random() * offTeam.starters.length);
+            offPlayer = offTeam.starters[randomPlayerIndex];
+            defPlayer = defTeam.starters[randomPlayerIndex];
         } else {
-            const randomPlayerIndex = Math.floor(Math.random() * team.bench.length);
-            player = team.bench[randomPlayerIndex];
+            const randomPlayerIndex = Math.floor(Math.random() * offTeam.bench.length);
+            offPlayer = offTeam.bench[randomPlayerIndex];
+            defPlayer = defTeam.bench[randomPlayerIndex];
         }
 
-        return simulatePlayerScore(player);
+        return simulatePlayerScore(offPlayer, defPlayer);
     }
 
-    function simulatePlayerScore(player) {
-        const randomNum = Math.random() * 100;
-        const playerFgPercentage = minFgPercentage + (player.overall / 100) * (100 - minFgPercentage);
-        if (randomNum < playerFgPercentage) {
+    function simulatePlayerScore(offPlayer, defPlayer) {
+        const randomNum = Math.random();
+        const chance = offPlayer.overall / (offPlayer.overall + defPlayer.overall);
+        if (randomNum < chance) {
             const pointAmountNum = Math.random() * 100;
             if (pointAmountNum < 70) {
                 return 2;
@@ -241,18 +243,18 @@ function simulateGame(team1, team2) {
     }
 
     for (let i = 0; i < starterPossessions; i++) {
-        teamScore1 += simulatePossession(team1, "starters");
-        teamScore2 += simulatePossession(team2, "starters");
+        teamScore1 += simulatePossession(team1, team2, "starters");
+        teamScore2 += simulatePossession(team2, team1, "starters");
     }
 
     for (let i = 0; i < benchPossessions; i++) {
-        teamScore1 += simulatePossession(team1, "bench");
-        teamScore2 += simulatePossession(team2, "bench");
+        teamScore1 += simulatePossession(team1, team2, "bench");
+        teamScore2 += simulatePossession(team2, team1, "bench");
     }
 
     while (teamScore1 === teamScore2) {
-        teamScore1 += simulatePossession(team1, "starters");
-        teamScore2 += simulatePossession(team2, "starters");
+        teamScore1 += simulatePossession(team1, team2, "starters");
+        teamScore2 += simulatePossession(team2, team1, "starters");
     }
 
    return teamScore1 > teamScore2 ? team1 : team2;
